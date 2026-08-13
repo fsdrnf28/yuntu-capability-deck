@@ -180,9 +180,15 @@
     .roles .o { background: var(--mint); }
     @media (max-width: 980px) {
       .grid3 { grid-template-columns: 1fr; }
+      .grid4 { grid-template-columns: 1fr 1fr; }
       .chain-head, .chain-step { grid-template-columns: 36px 1fr; }
       .chain-head span:last-child, .chain-step .box.bot { grid-column: 2; }
     }
+    .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .stage { background: var(--paper); border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow); }
+    .stage .ord { font-size: 11px; color: var(--mint); letter-spacing: .12em; margin-bottom: 6px; }
+    .stage b { display: block; margin-bottom: 6px; }
+    .stage p { margin: 0; color: var(--muted); font-size: 12.5px; }
   </style>
 </head>
 <body>
@@ -397,144 +403,184 @@
     </section>
 
     <section class="panel" id="claw">
-      <p class="lede">人只在飞书里提需求、拍板、收结果。OpenClaw 负责问清楚、去云图执行、人数齐了再把原数据和分析一起送回来。人不进云图后台，也不用自己改程序。</p>
+      <p class="lede">代码上服务器之后，人把业务需求发到飞书。OpenClaw 先自己确认需求，再按下面四段往前走：先跟人一起改单个功能，再自己设计多个功能的串联和并发，然后配成定时任务，全部做完后把原数据和分析结论一起交回。</p>
       <div class="kpis">
-        <div class="kpi"><b>人</b><span>飞书提需求、拍板、收结果</span></div>
-        <div class="kpi"><b>OpenClaw</b><span>问清楚、去执行、值守、回传</span></div>
-        <div class="kpi"><b>云图</b><span>建标签、建包、出覆盖人数</span></div>
-        <div class="kpi"><b>不停手</b><span>缺数就问人，不猜、不编</span></div>
+        <div class="kpi"><b>① 改单功能</b><span>人配合 OpenClaw 改写一块逻辑</span></div>
+        <div class="kpi"><b>② Deep Engineer</b><span>自己设计多功能串联 / 并发</span></div>
+        <div class="kpi"><b>③ 定时</b><span>配成到点自动跑</span></div>
+        <div class="kpi"><b>④ 成套交付</b><span>原数据 + 分析结论一起给</span></div>
+      </div>
+      <div class="grid4" style="margin-bottom:16px">
+        <div class="stage">
+          <div class="ord">一开始</div>
+          <b>改写单个功能</b>
+          <p>对着已经跑通的样例，只改这一块。人看改法、拍板。还不是整条链路。</p>
+        </div>
+        <div class="stage">
+          <div class="ord">后面 · Deep Engineer</div>
+          <b>自己设计 DAG</b>
+          <p>多个功能谁先谁后、谁可以一起做，由 OpenClaw 自己排，人确认整张图。</p>
+        </div>
+        <div class="stage">
+          <div class="ord">再然后</div>
+          <b>配成定时任务</b>
+          <p>DAG 跑通后，设成每周 / 每月自动启动。失败只问人，不擅自写云图。</p>
+        </div>
+        <div class="stage">
+          <div class="ord">全部做完后</div>
+          <b>原数据 + 分析一起交</b>
+          <p>覆盖人数齐了，按人的问题写结论。两样同一条飞书，缺一样不算交付。</p>
+        </div>
       </div>
       <div class="card" style="margin-bottom:16px">
-        <h2>人与 OpenClaw 怎么配合</h2>
-        <p style="margin:0 0 12px;color:var(--muted)">从发需求到收回报告，始终是两边轮流出手。灰色格表示这一步对方在等。</p>
+        <h2>入口：飞书把需求发给 OpenClaw，它自己确认</h2>
+        <p>人不进云图、不 SSH。半句话也可以。OpenClaw 必须先回确认卡，人回「确认」才往下走。</p>
         <div class="roles"><span><i class="h"></i>人</span><span><i class="o"></i>OpenClaw</span></div>
         <div class="chain-head"><span></span><span>人</span><span>OpenClaw</span></div>
         <div class="chain-step">
           <div class="n">1</div>
-          <div class="box human"><b>飞书说要做什么</b><span>可半句，可附 Excel / 词表。不进云图后台。</span></div>
-          <div class="box idle"><b>等待</b><span>收到消息后再动。</span></div>
+          <div class="box human"><b>飞书说要做什么</b><span>可半句，可附 Excel / 词表。</span></div>
+          <div class="box bot"><b>回确认卡</b><span>写清品类、周期、是否正式写入云图、将走①②③④哪一段。</span></div>
         </div>
         <div class="chain-step">
           <div class="n">2</div>
-          <div class="box idle"><b>等待确认卡</b><span>先看它理解得对不对。</span></div>
-          <div class="box bot"><b>回确认卡</b><span>写清：品类、哪一周/哪一月、试跑还是正式写入云图、将做哪些事。</span></div>
+          <div class="box human"><b>回「确认」或改一处</b><span>日期、品类、写不写云图，以人这句为准。</span></div>
+          <div class="box idle"><b>等待拍板</b><span>不问清不猜，未确认不写云图。</span></div>
         </div>
-        <div class="chain-step">
-          <div class="n">3</div>
-          <div class="box human"><b>回「确认」或改一处</b><span>日期、品类、是否写云图，以人这一句为准。不确认，OpenClaw 不写入云图。</span></div>
-          <div class="box idle"><b>等待拍板</b><span>缺的项不问清楚，不猜测。</span></div>
-        </div>
-        <div class="chain-step">
-          <div class="n">4</div>
-          <div class="box idle"><b>等进度</b><span>不用自己点云图。</span></div>
-          <div class="box bot"><b>按已有能力执行</b><span>建标签、建人群包、填表。能同时做的一起做；必须等人的，等覆盖人数出来再做交集。</span></div>
-        </div>
-        <div class="chain-step">
-          <div class="n">5</div>
-          <div class="box idle"><b>只看阻塞</b><span>例如「某标签还在计算」。</span></div>
-          <div class="box bot"><b>值守到齐</b><span>人数没出就继续等，不编数字，不跳步做转化包。</span></div>
-        </div>
-        <div class="chain-step">
-          <div class="n">6</div>
-          <div class="box human"><b>同一条飞书收回</b><span>原数据 + 分析报告。要转给看数同事就转发这一整条。</span></div>
-          <div class="box bot"><b>成套回传</b><span>先确认已经全部做完，再按人的问题写分析。只发分析、不发原数据，不算完成。</span></div>
-        </div>
-        <p class="src">第 1 步怎么写，见「指令与材料」。第 6 步收回什么，见「原数据与分析」。</p>
+        <div class="say">人：给飞利浦加一套只要购买、不要点击的标签，挂进周报，以后每周自动跑，跑完把原数据和分析一起发我。
+OpenClaw 确认卡必须拆开：先改哪一个功能 → 再怎么串进整条周报 → 是否设定时 → 交付是原数据+分析。不能合成一句「新能力」就开跑。</div>
       </div>
-      <div class="grid3" style="margin-bottom:16px">
-        <div class="card">
-          <h3>日常：跑已有报表</h3>
-          <p>人喊「跑上周周报 / 跑 7 月月报」。OpenClaw 对上已有能力，只改周期等参数，确认后开跑。人不用改程序。</p>
+      <div class="card" style="margin-bottom:16px">
+        <h2>① 一开始：人配合 OpenClaw 改写单个功能</h2>
+        <p>这一段只改一块逻辑。人要看懂「改的是什么」，OpenClaw 对着现成样例改，禁止从空白写一套。</p>
+        <div class="chain-head"><span></span><span>人</span><span>OpenClaw</span></div>
+        <div class="chain-step">
+          <div class="n">1</div>
+          <div class="box human"><b>说这一块要什么</b><span>例如「只要购买、不要点击的第二套标签」。</span></div>
+          <div class="box bot"><b>找出最像的样例</b><span>周报标签工厂、交集、差集、月报品类档，复制后再改。</span></div>
         </div>
-        <div class="card">
-          <h3>新能力：现有功能不够</h3>
-          <p>人说还要什么。OpenClaw 找出最像的现成模块，说明改哪一块、哪些步骤可同时做、哪些必须等人数。人确认后，它改完并变成以后可直接喊的能力，必要时设成到点自动跑。</p>
+        <div class="chain-step">
+          <div class="n">2</div>
+          <div class="box human"><b>确认这一块的改法</b><span>看将改的行为、配对、阈值；先试跑、不写云图。</span></div>
+          <div class="box bot"><b>只改这一处</b><span>把将生成的包名发回飞书。人没点头，不装成可喊的能力。</span></div>
         </div>
-        <div class="card">
-          <h3>定时：人不必每周再喊</h3>
-          <p>周期结束跑周报、月初建月报包、每月 10 日后填情报通。失败（登录失效、缺日期）只飞书问人，不擅自写云图。正式写入前默认仍要确认一次，除非人事先说以后免确认。</p>
+        <table>
+          <thead><tr><th>人要的单功能</th><th>对着哪份样例改</th><th>只改什么</th></tr></thead>
+          <tbody>
+            <tr><td>只要购买、不要点击</td><td>标签工厂建包</td><td>行为只留购买</td></tr>
+            <tr><td>新的转化配对</td><td>人群包交集</td><td>A 包和 B 包怎么配、结果叫什么</td></tr>
+            <tr><td>新的差集定义</td><td>人群包差集</td><td>谁减谁、结果叫什么</td></tr>
+            <tr><td>月报多一档意向</td><td>现有品类 A3</td><td>触点阈值</td></tr>
+          </tbody>
+        </table>
+        <p class="src">作差购买、月报低意向档，当初都是这样从单块样例改出来的。这一段结束时，只有一个可单独喊的功能，还没有整条周报/月报的编排。</p>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <h2>② 后面：OpenClaw 自己设计串联 / 并发 DAG（Deep Engineer）</h2>
+        <p>单功能齐了之后，人不再手排「先跑谁、后跑谁」。Deep Engineer 自己画出多功能怎么串、怎么并行。人确认的是整张步骤图，不是每一行代码。</p>
+        <div class="chain-head"><span></span><span>人</span><span>OpenClaw · Deep Engineer</span></div>
+        <div class="chain-step">
+          <div class="n">1</div>
+          <div class="box human"><b>说要一条完整任务</b><span>例如「把新标签编进周报主链路」。</span></div>
+          <div class="box bot"><b>自己排出步骤图</b><span>哪些同时做，哪些必须等覆盖人数。把图发回飞书。</span></div>
+        </div>
+        <div class="chain-step">
+          <div class="n">2</div>
+          <div class="box human"><b>确认这张图</b><span>看并行是否合理、有没有把转化放到人数出来之前。</span></div>
+          <div class="box bot"><b>按图把功能串起来</b><span>试跑不写云图。通过后，这条链才能被定时调用。</span></div>
+        </div>
+        <table>
+          <thead><tr><th>它必须自己排出来的</th><th>已经在跑的周报 / 月报样例</th></tr></thead>
+          <tbody>
+            <tr><td>互不依赖的功能并行</td><td>关键词、点购标签、情报通可以同时做</td></tr>
+            <tr><td>有先后的必须串</td><td>先点购标签，再作差；先有购买包，再做转化和差集</td></tr>
+            <tr><td>人数没出，不准提交下一步</td><td>没有覆盖人数，不准做交集包</td></tr>
+            <tr><td>月报同构</td><td>内容标签齐 → 品类 → 新增 → 购买交和看播交同时</td></tr>
+          </tbody>
+        </table>
+        <p class="src">Deep Engineer 不是把几个单功能叠在一起交差。它要自己决定并发和等待。打乱「等人」这条规则的图，人必须驳回。</p>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <h2>③ 再然后：自动配成定时任务</h2>
+        <p>DAG 试跑通过之后，才进入这一段。OpenClaw 自己写下一次何时启动，人确认时间表。到点不必人再喊「开始跑」。</p>
+        <div class="chain-head"><span></span><span>人</span><span>OpenClaw</span></div>
+        <div class="chain-step">
+          <div class="n">1</div>
+          <div class="box human"><b>确认何时跑、要不要每次再确认</b><span>默认正式写入云图前仍问一次，除非人事先说免确认。</span></div>
+          <div class="box bot"><b>写入定时</b><span>调用已经排好的 DAG，不是另写一套。</span></div>
+        </div>
+        <div class="chain-step">
+          <div class="n">2</div>
+          <div class="box idle"><b>平时不用管</b><span>只在它问的时候接手。</span></div>
+          <div class="box bot"><b>到点启动；失败只问人</b><span>登录失效、缺去年日期、人数未齐，停写云图并飞书说明。</span></div>
+        </div>
+        <table>
+          <thead><tr><th>定时做什么</th><th>何时</th><th>失败时问人什么</th></tr></thead>
+          <tbody>
+            <tr><td>不需运算线</td><td>周报周期锁定后、主链路前</td><td>去年日期没手写则停</td></tr>
+            <tr><td>周报主链路</td><td>周期结束后或约定周一</td><td>登录失效则密聊要新凭证</td></tr>
+            <tr><td>月报建包</td><td>每月 1 日先试跑，确认后再正式</td><td>没确认不准正式写入</td></tr>
+            <tr><td>情报通</td><td>每月 10 日及之后</td><td>平台未出数则只报未出</td></tr>
+            <tr><td>成套交付</td><td>全部做完之后</td><td>仍缺覆盖人数则只发状态，不写分析结论</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <h2>④ 交付形式：原数据和分析结论必须一起给</h2>
+        <p>不是「跑完就算」。全部做完后，OpenClaw 按人的分析问题写结论，和原数据放在同一条飞书里。只发结论、不发原数据，视为没交付。细节在「原数据与分析」。</p>
+        <div class="chain-head"><span></span><span>人</span><span>OpenClaw</span></div>
+        <div class="chain-step">
+          <div class="n">1</div>
+          <div class="box human"><b>分析要回答什么（可空）</b><span>空则出标准切片。有问题贴原话。</span></div>
+          <div class="box bot"><b>先判定齐数</b><span>该填的都有数、人群包都有覆盖人数。没齐只报还在算什么。</span></div>
+        </div>
+        <div class="chain-step">
+          <div class="n">2</div>
+          <div class="box human"><b>同一条消息收回两样</b><span>原数据附件 + 分析结论。转给看数同事也要整条转发。</span></div>
+          <div class="box bot"><b>两样一起发出</b><span>每条结论都能指回某一个包的覆盖人数。人数未出不估算。</span></div>
         </div>
       </div>
       <div class="card" style="margin-bottom:16px">
         <h2>人必须拍板的几件事</h2>
-        <p>OpenClaw 可以自己补全理解，但不能替人决定下面这些。</p>
         <table>
           <thead><tr><th>拍板项</th><th>人怎么说</th><th>OpenClaw 不许做的</th></tr></thead>
           <tbody>
-            <tr><td>品类</td><td>MG、OHC，或两者都要。月报默认 MG。</td><td>自己改品类范围</td></tr>
-            <tr><td>周期</td><td>周报起止日，或哪一个自然月。去年各段日期必须人手写。</td><td>自己推去年日期</td></tr>
-            <tr><td>试跑 / 正式</td><td>试跑用标识词如「测」；正式说空。是否写入云图必须明确。</td><td>未确认就往云图里创建</td></tr>
-            <tr><td>做哪些</td><td>全跑，或只要标签 / 建包 / 填表 / 分析。</td><td>扩大范围却不说</td></tr>
-            <tr><td>分析问题</td><td>没有加问就出标准切片；有问题按原话切，不另起口径。</td><td>人数未出时估算</td></tr>
+            <tr><td>品类 / 周期</td><td>MG、OHC；周报起止或自然月。去年日期人手写。</td><td>自己推去年日期</td></tr>
+            <tr><td>试跑 / 正式</td><td>是否写入云图必须明确。</td><td>未确认就创建</td></tr>
+            <tr><td>① 单功能改法</td><td>确认改的是哪一块。</td><td>偷偷改别的模块</td></tr>
+            <tr><td>② DAG 步骤图</td><td>确认谁并行、谁等待。</td><td>人数没出就提交交集</td></tr>
+            <tr><td>③ 定时</td><td>何时跑、以后是否免确认。</td><td>失败仍写云图</td></tr>
+            <tr><td>④ 分析问题</td><td>没有加问就标准切片；有问题按原话。</td><td>只发结论不发原数据</td></tr>
           </tbody>
         </table>
-        <div class="say">人：跑飞利浦上周周报，MG 和 OHC，正式，写云图。
-OpenClaw 必须先回确认卡，例如：
-任务：周报全跑
-品类：MG + OHC
-周期：请核对 2026-08-03 ~ 2026-08-09
-正式写入云图：是
-请回复「确认」或改周期。</div>
-      </div>
-      <div class="card" style="margin-bottom:16px">
-        <h2>新能力时，两边怎么接手</h2>
-        <div class="chain-head"><span></span><span>人</span><span>OpenClaw</span></div>
-        <div class="chain-step">
-          <div class="n">1</div>
-          <div class="box human"><b>说还缺什么</b><span>例如「只要购买、不要点击的第二套标签」。</span></div>
-          <div class="box bot"><b>指出最像的现成模块</b><span>从已经跑通的周报/月报能力里复制，不从空白写一套。</span></div>
-        </div>
-        <div class="chain-step">
-          <div class="n">2</div>
-          <div class="box human"><b>确认改法</b><span>看将改哪一块、新能力叫什么、先试跑不写云图。</span></div>
-          <div class="box bot"><b>只改一处并排步骤</b><span>能并行的并行；必须等覆盖人数的放后面。试跑把将生成的包名发回飞书。</span></div>
-        </div>
-        <div class="chain-step">
-          <div class="n">3</div>
-          <div class="box human"><b>确认可以正式用</b><span>以后这条会出现在「指令与材料」里，直接喊即可。</span></div>
-          <div class="box bot"><b>装成可喊的能力</b><span>需要的话设成每周/每月自动跑。登录失效只问人。</span></div>
-        </div>
-        <p class="src">历史就是这样加出来的：作差购买从标签工厂复制后只留购买；月报低意向档从高意向档学来后去掉「排除新增」。</p>
       </div>
       <div class="grid21" style="margin-bottom:16px">
         <div class="card">
           <h3>现在（本机代码）</h3>
-          <p>人改配置、双击开始。开发期可以用浏览器辅助登录。需求走口头或直接改文件。</p>
+          <p>人改配置、双击开始。单功能、步骤顺序、定时都是人排的。</p>
         </div>
         <div class="card">
           <h3>以后（服务器 + 飞书）</h3>
-          <p>同一套周报、月报程序放到服务器。人只在飞书说话。OpenClaw 改参数、开跑、必要时按样例加能力。服务器上没有本人浏览器。</p>
+          <p>同一套程序在服务器。人只在飞书说话。OpenClaw 确认需求后，按 ①改单功能 → ②自己设计 DAG → ③定时 → ④原数据+分析 往下走。</p>
         </div>
       </div>
-      <div class="card" style="margin-bottom:16px">
-        <h2>谁已经能做，谁还要接飞书</h2>
-        <table>
-          <thead><tr><th></th><th>状态</th><th>人怎么理解</th></tr></thead>
-          <tbody>
-            <tr><td>周报、月报整条建包与填表</td><td class="yes">已有</td><td>本机已经在跑。接到飞书后，人改的是周期，不是重写程序。</td></tr>
-            <tr><td>登录凭证放文件里</td><td class="yes">已有</td><td>密聊发给 OpenClaw，不进群、不进公开文档。</td></tr>
-            <tr><td>飞书里喊一句就跑</td><td class="no">待接</td><td>把现有周报/月报能力接到飞书 Bot。</td></tr>
-            <tr><td>不够时自动加能力、设定时</td><td class="no">待接</td><td>即上面「新能力」「定时」两条链。</td></tr>
-          </tbody>
-        </table>
-      </div>
       <div class="card">
-        <h2>步骤先后，用已经在跑的周报/月报当样</h2>
-        <p>新能力不能打乱这条顺序。能一起做的才并行；转化、差集必须等购买包覆盖人数出来。</p>
+        <h2>谁已经能做，谁还待接</h2>
         <table>
-          <thead><tr><th>原则</th><th>已经在用的例子</th></tr></thead>
+          <thead><tr><th></th><th>状态</th><th>说明</th></tr></thead>
           <tbody>
-            <tr><td>互不依赖的，同时做</td><td>周报：关键词、点购标签、情报通可以一起</td></tr>
-            <tr><td>有先后的，串起来</td><td>先有点购标签，才能作差；先有购买包，才能做转化和差集</td></tr>
-            <tr><td>人数没出，不做下一步</td><td>没有覆盖人数，不准提交交集包</td></tr>
-            <tr><td>月报同理</td><td>内容标签齐 → 品类包 → 新增 → 购买交与看播交可同时</td></tr>
+            <tr><td>周报 / 月报各单功能与现有步骤图</td><td class="yes">已有</td><td>本机代码已经在跑，是 ①② 的样例</td></tr>
+            <tr><td>飞书确认需求后执行</td><td class="no">待接</td><td>入口还没接到 Bot</td></tr>
+            <tr><td>① 配合人改写单功能</td><td class="no">待接</td><td>对着样例改一处，封成可喊的能力</td></tr>
+            <tr><td>② Deep Engineer 自己设计 DAG</td><td class="no">待接</td><td>多功能串联 / 并发，人确认步骤图</td></tr>
+            <tr><td>③ 自动配定时</td><td class="no">待接</td><td>DAG 通过后才写</td></tr>
+            <tr><td>④ 原数据 + 分析一起交付</td><td class="no">待接</td><td>取数填表已有，按问题写分析并成套回传待建</td></tr>
           </tbody>
         </table>
-        <p class="src">到点自动跑：不需运算线在主链路前；周报在周期结束后；月报每月 1 日先试跑；情报通每月 10 日及之后；分析只在全部做完之后。</p>
       </div>
     </section>
     <section class="panel" id="talk">
-      <p class="lede">这一页是合作链的第 1 步：人从左侧点功能，把句子复制到飞书，按清单附材料。OpenClaw 缺项必须回问；人没确认，不写入云图。</p>
+      <p class="lede">这一页给①改单功能、②设计 DAG、③配定时、以及日常喊已有能力时用。人从左侧点对应步骤，复制到飞书。OpenClaw 必须先确认再做；四段不要混在一条指令里。</p>
       <div class="card" style="margin-bottom:16px">
         <h2>每次都用的句子骨架</h2>
         <div class="say">任务：&lt;下面左侧的功能名&gt;
@@ -571,9 +617,9 @@ OpenClaw 必须先回确认卡，例如：
     </section>
 
     <section class="panel" id="analysis">
-      <p class="lede">这一页是合作链的最后一环。人数齐了之后，OpenClaw 按人的问题写分析，并把原数据和分析放在同一条飞书里交回。人转发时也要整条转发，不能只转结论。</p>
+      <p class="lede">这一页对应合作链第 ④ 段：全部做完后的交付形式。原数据和分析结论必须同一条飞书一起给到用户。只给结论、不给原数据，不算交付。</p>
       <div class="card" style="margin-bottom:16px">
-        <h2>交回时两边做什么</h2>
+        <h2>交付形式：原数据 + 分析结论一起到</h2>
         <div class="chain-head"><span></span><span>人</span><span>OpenClaw</span></div>
         <div class="chain-step">
           <div class="n">1</div>
@@ -1061,16 +1107,21 @@ OpenClaw 必须先回确认卡，例如：
         need: "用户分析问题原文。对应周/月必须已齐数，或允许只回未齐清单。",
         does: "对齐数检查 → 打包原数据 → 按问题切片 → 结论全部指回 cover。",
         back: "同一条飞书：状态 + 分析 + 原数据附件 + 分析件。" },
-      { id: "x-skill", g: "扩展", name: "新需求改样例封 skill",
-        say: "任务：新需求改样例并封 skill\n要做：<一句话说清>\n样例：请按最像的现有子工具复制（例如标签工厂建包 / 人群包交集-对应 / dag.js）\n改动：只改一处\nDAG：写清挂在哪一阶段、是否并行\n定时：不要 / 或 cron\n写云图：否（先 dry-run）\n请先出确认卡，不要直接改文件。",
-        need: "新需求原话；指出最像哪条已有功能。工程已在服务器路径上。",
-        does: "找出最像的现成模块，只改一处，先试跑把将生成的包名发回；人确认后再装成可直接喊的能力。",
-        back: "将改文件、新 skill 名、dry-run 包名、是否写 cron。" },
-      { id: "x-cron", g: "扩展", name: "配定时任务",
-        say: "任务：配定时\n对象：周报主链路 / 不需运算 / 月报 dry-run / 情报通 / 分析回传\n触发：weekEnd 次日 / 每月1日 / 每月10日 等\n写云图：正式任务仍先发确认卡，除非我声明以后免确认\nCookie 失效只飞书问我，不要写云图。",
-        need: "要定时的任务名、时区、是否免确认。",
-        does: "设成到点自动跑同一件事。失败只飞书问人，不写云图。",
-        back: "cron 表达式、下次触发时间、失败时飞书问什么。" },
+      { id: "x-skill", g: "扩展", name: "① 改写单个功能",
+        say: "任务：改写单个功能\n要做：<一句话说清这一块>\n样例：最像的现成功能（标签工厂 / 交集 / 差集 / 品类档）\n只改这一处\n先试跑，不写云图\n这一步不要排整条链路，也不要设定时。\n请先出确认卡。",
+        need: "这一块功能的原话。指出最像哪条已有能力。",
+        does: "对着样例只改一处，试跑把将生成的包名发回。人确认后装成可单独喊的能力。",
+        back: "改了哪一块、试跑包名。到此为止，不自动进入 DAG 或定时。" },
+      { id: "x-dag", g: "扩展", name: "② 设计串联并发 DAG",
+        say: "任务：Deep Engineer 设计 DAG\n要把哪些已有功能串起来：<列出>\n请自己排出：谁并行、谁必须等覆盖人数\n把步骤图发我确认，不要直接改编排\n写云图：否（先按图试跑）",
+        need: "已经改好的单功能名单。说明这是一条完整任务（周报主链路 / 月报 0到5 等）。",
+        does: "自己设计多功能串联和并发，遵守「人数没出不做交集」。人确认步骤图后再串起来。",
+        back: "步骤图（并行 / 串行 / 等待）。人驳回则重排，不进入定时。" },
+      { id: "x-cron", g: "扩展", name: "③ 配定时任务",
+        say: "任务：配定时\n对象：已经试跑通过的 DAG\n触发：周期结束后 / 每月1日 / 每月10日 等\n正式写入前默认仍要确认，除非我声明免确认\n登录失效只飞书问我，不要写云图。",
+        need: "要定时的那条 DAG 名称、时区、是否免确认。DAG 必须已经试跑通过。",
+        does: "把已通过的 DAG 写成到点自动跑。失败停写并问人。",
+        back: "何时触发、下次时间、失败时问什么。" },
       { id: "d-live", g: "改卡", name: "改直播主播",
         say: "任务：改直播圈人主播名单\n月报 config.liveAnchors 换成附件 ID\n先 dry-run 给我看包名变化，确认后再写云图。",
         need: "主播名称 + 云图账号 ID 表。说明要改月报还是周报 Search 进店。",
@@ -1082,7 +1133,7 @@ OpenClaw 必须先回确认卡，例如：
         does: "改词包配置，不改卡片类型。",
         back: "新旧词数量、将重建哪些标签/包。" }
     ];
-    const TALK_GROUPS = [["一次","一次性"],["周报","周报"],["月报","月报"],["分析","分析"],["扩展","扩展"],["改卡","改卡片参数"]];
+    const TALK_GROUPS = [["一次","一次性"],["周报","周报"],["月报","月报"],["分析","④ 交付"],["扩展","①②③ 扩展"],["改卡","改卡片参数"]];
     let talkId = "w-full";
     function talkCur() { return TALKS.find((t) => t.id === talkId) || TALKS[0]; }
     function renderTalk() {
