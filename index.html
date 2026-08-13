@@ -167,7 +167,7 @@
       <button data-tab="monthly">月报拓扑</button>
       <button data-tab="ops">运算与交付</button>
       <button class="pri" data-tab="claw">飞书 OpenClaw</button>
-      <button class="pri" data-tab="talk">怎么对 OpenClaw 说话</button>
+      <button class="pri" data-tab="talk">指令与材料</button>
       <button class="pri" data-tab="analysis">原数据与分析</button>
     </div>
 
@@ -436,7 +436,7 @@
         <table>
           <thead><tr><th>怎么发</th><th>做法</th><th>OpenClaw 收到什么</th></tr></thead>
           <tbody>
-            <tr><td>日常跑已有功能</td><td>在绑定群 @Bot，或单聊。第一句写任务名（见「怎么对 OpenClaw 说话」）</td><td>文本槽位；Excel / 词表 / 主播名单作附件</td></tr>
+            <tr><td>日常跑已有功能</td><td>在绑定群 @Bot，或单聊。第一句写任务名（见「指令与材料」）</td><td>文本槽位；Excel / 词表 / 主播名单作附件</td></tr>
             <tr><td>Cookie、密钥</td><td>只走密聊，不进群、不进 git</td><td>写入 <code>.yuntu_cookie.local</code></td></tr>
             <tr><td>新功能（现有 skill 不够）</td><td>群里说要做什么，并指明「按现有样例改」</td><td>进入 Deep Engineer：认样例 → 改一处 → 再出确认卡</td></tr>
             <tr><td>半句话也可以</td><td>例如「跑上周 MG 周报」</td><td>必须回确认卡补齐周期 / 标识词 / 写云图，等「确认」</td></tr>
@@ -512,7 +512,7 @@
 将执行：开始.command → dag.js 阶段1–10；未齐则值守完成.command
 将改文件：周报总控/config.js 仅 weekStart/weekEnd/deliveryTag/nameRunMark
 请回复「确认」或指出要改的槽位。</div>
-        <div class="num"><i>1</i><p><b>能对上已有 skill</b>只改配置，不改代码。对应「怎么对 OpenClaw 说话」里每一个功能。</p></div>
+        <div class="num"><i>1</i><p><b>能对上已有 skill</b>只改配置，不改代码。对应「指令与材料」里每一个功能。</p></div>
         <div class="num"><i>2</i><p><b>对不上</b>进入 Deep Engineer：说明将复制哪份样例、改哪几个文件、新 skill 名字、DAG 哪一阶段并行。再等第二次「确认」。</p></div>
         <div class="num"><i>3</i><p><b>执行中</b>飞书只报阶段与阻塞（标签计算中、无 cover 未提交交集）。不把 MCP 点云图当进度。</p></div>
       </div>
@@ -529,7 +529,7 @@
             <tr><td>只要段码、不要交差集</td><td><code>开始.command</code> 编排</td><td>关掉 cvr / dif / 建出 / SV</td><td>已有形态：不需运算数据</td></tr>
           </tbody>
         </table>
-        <p class="src">封 skill 的标准动作：复制样例目录 → 改配置字段与最少代码 → dry-run 不写云图 → 用户确认 → 写入 OpenClaw skills 目录 → 在「怎么对 OpenClaw 说话」增加一条话术。</p>
+        <p class="src">封 skill 的标准动作：复制样例目录 → 改配置字段与最少代码 → dry-run 不写云图 → 用户确认 → 写入 OpenClaw skills 目录 → 在「指令与材料」增加一条话术。</p>
       </div>
       <div class="card" style="margin-top:16px">
         <h2>Deep Engineer 自己设计并发 DAG</h2>
@@ -589,7 +589,7 @@
           <div class="ph"><b>5</b>部署</div>
           <div class="row">
             <div class="nodes">
-              <div class="node"><b>封 skill</b><span>拷到服务器 OPENCLAW_SKILLS_DIR；话术写入「怎么对 OpenClaw 说话」</span></div>
+              <div class="node"><b>封 skill</b><span>拷到服务器 OPENCLAW_SKILLS_DIR；话术写入「指令与材料」</span></div>
               <div class="node"><b>配定时</b><span>cron 调同一 command；失败只飞书、不写云图</span></div>
             </div>
           </div>
