@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>巨量云图可编程控制 · 飞利浦周报 / 月报</title>
+  <style>
+    :root {
+      --ink: #12211e;
+      --muted: #5b6b67;
+      --line: #d9e2de;
+      --paper: #ffffff;
+      --bg: #eef3f1;
+      --teal: #0f4c46;
+      --mint: #1aa38d;
+      --mint-dim: #d7f3ec;
+      --amber: #c46a1b;
+      --amber-dim: #f8e6d4;
+      --off: #8b9794;
+      --shadow: 0 10px 30px rgba(18, 33, 30, .06);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font: 14px/1.55 "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+    }
+    header {
+      background: linear-gradient(135deg, #0b2f2b 0%, #14645b 58%, #1aa38d 140%);
+      color: #f4fffb;
+      padding: 36px 40px 28px;
+    }
+    header .kicker { font-size: 11px; letter-spacing: .18em; opacity: .7; text-transform: uppercase; }
+    header h1 { margin: 8px 0 10px; font-size: 26px; font-weight: 620; letter-spacing: .01em; }
+    header p { margin: 0; max-width: 820px; opacity: .82; font-size: 14px; }
+    .wrap { max-width: 1280px; padding: 22px 40px 88px; }
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 22px; }
+    .tabs button {
+      border: 0;
+      background: var(--paper);
+      color: var(--ink);
+      padding: 9px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      font: inherit;
+      box-shadow: var(--shadow);
+    }
+    .tabs button.on { background: var(--teal); color: #fff; }
+    .panel { display: none; animation: in .25s ease; }
+    .panel.on { display: block; }
+    @keyframes in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    h2 { font-size: 16px; margin: 0 0 12px; }
+    h3 { font-size: 13px; margin: 0 0 8px; }
+    .lede { margin: 0 0 18px; color: var(--muted); max-width: 880px; }
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+    .kpi { background: var(--paper); border-radius: 12px; padding: 16px 18px; box-shadow: var(--shadow); }
+    .kpi b { display: block; font-size: 22px; }
+    .kpi span { color: var(--muted); font-size: 12px; }
+    .grid2 { display: grid; grid-template-columns: 340px 1fr; gap: 16px; align-items: start; }
+    .grid21 { display: grid; grid-template-columns: 1fr 1.15fr; gap: 16px; }
+    .explorer { display: grid; grid-template-columns: 248px 1fr; gap: 16px; align-items: start; }
+    .nav-list { background: var(--paper); border-radius: 14px; padding: 10px 8px 12px; box-shadow: var(--shadow); }
+    .nav-list .g { margin: 12px 8px 4px; font-size: 11px; color: var(--muted); letter-spacing: .06em; }
+    .nav-list .g:first-child { margin-top: 4px; }
+    .nav-list button {
+      display: block; width: 100%; text-align: left;
+      border: 0; background: transparent; color: var(--ink);
+      padding: 7px 10px; border-radius: 8px; cursor: pointer; font: inherit; font-size: 13px;
+    }
+    .nav-list button:hover { background: #f3f8f6; }
+    .nav-list button.on { background: var(--teal); color: #fff; }
+    .detail h2 { margin: 4px 0 6px; }
+    .detail .api { margin: 0 0 14px; color: var(--muted); }
+    .kv th { width: 108px; white-space: nowrap; }
+    .use { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+    .use > div { background: #f4f8f6; border-radius: 10px; padding: 12px 14px; }
+    .use p { margin: 0; font-size: 13px; }
+    @media (max-width: 980px) {
+      .kpis, .grid2, .grid21, .explorer, .swim, .use { grid-template-columns: 1fr; }
+      header, .wrap { padding-left: 18px; padding-right: 18px; }
+    }
+    .card { background: var(--paper); border-radius: 14px; padding: 16px 18px; box-shadow: var(--shadow); }
+    .rail { font-size: 12.5px; }
+    .rail .g { margin: 14px 0 6px; color: var(--muted); font-size: 11px; letter-spacing: .08em; }
+    .rail .item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 5px 8px; border-radius: 6px; margin: 2px 0;
+    }
+    .rail .item.ok { background: var(--mint-dim); }
+    .rail .item.off { color: var(--off); }
+    .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 7px; background: var(--off); }
+    .ok .dot { background: var(--mint); }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); font-size: 12.5px; vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; }
+    .yes { color: #0f6d5c; font-weight: 650; }
+    .no { color: var(--off); }
+    .crumb { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+    .op { display: inline-block; font-size: 11px; padding: 2px 7px; border-radius: 999px; margin-right: 4px; }
+    .op.u { background: #e8f0ee; }
+    .op.i { background: var(--amber-dim); color: var(--amber); }
+    .op.e { background: #ece7e2; }
+    .swim { display: grid; grid-template-columns: 92px 1fr; gap: 0; }
+    .ph { padding: 14px 8px 14px 0; color: var(--muted); font-size: 11px; border-right: 2px solid #d3ddd9; }
+    .ph b { display: block; color: var(--ink); font-size: 12px; }
+    .row { padding: 12px 0 12px 18px; position: relative; }
+    .row::before {
+      content: ""; position: absolute; left: -5px; top: 22px;
+      width: 8px; height: 8px; border-radius: 50%; background: var(--mint);
+    }
+    .para {
+      background: linear-gradient(90deg, #e7f7f2, #f7fbf9);
+      border: 1px dashed #9ad4c6;
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .para .lab { font-size: 11px; color: var(--mint); letter-spacing: .12em; margin-bottom: 8px; }
+    .nodes { display: flex; gap: 10px; flex-wrap: wrap; }
+    .node {
+      background: #fff; border-radius: 10px; padding: 10px 12px; min-width: 168px;
+      box-shadow: 0 4px 14px rgba(18,33,30,.05); font-size: 12.5px;
+    }
+    .node b { display: block; margin-bottom: 4px; }
+    .node span { color: var(--muted); font-size: 12px; }
+    .node.ext { border-left: 3px solid #c4a056; }
+    .node.int { border-left: 3px solid var(--amber); }
+    .node.exc { border-left: 3px solid #8a7460; }
+    .legend { display: flex; gap: 14px; flex-wrap: wrap; margin: 0 0 14px; font-size: 12px; color: var(--muted); }
+    .src { margin-top: 12px; font-size: 12px; color: var(--muted); }
+    code { font-family: ui-monospace, Menlo, monospace; font-size: 11.5px; background: #eef4f2; padding: 1px 5px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="kicker">Ocean Engine · Yuntu Brand</div>
+    <h1>AI 对巨量云图的可编程控制</h1>
+    <p>
+      对照品牌版真实界面：顶栏模块、自定义分析「新建人群」左侧卡片、数据工厂标签工厂表单。
+      周报与月报通过 Cookie + GraphQL / PackAudience 复现同一套点选，而不是报表里自拟的业务板块。
+    </p>
+  </header>
+  <div class="wrap">
+    <div class="tabs" id="tabs">
+      <button class="on" data-tab="map">云图覆盖范围</button>
+      <button data-tab="cards">卡片与字段</button>
+      <button data-tab="weekly">周报拓扑</button>
+      <button data-tab="monthly">月报拓扑</button>
+      <button data-tab="ops">运算与交付</button>
+    </div>
+
+    <section class="panel on" id="map">
+      <div class="kpis">
+        <div class="kpi"><b>2 / 11</b><span>顶栏已接：人群、数据工厂</span></div>
+        <div class="kpi"><b>13</b><span>新建人群已接卡片（含运算）</span></div>
+        <div class="kpi"><b>建出</b><span>标签工厂「创建人群包」→ 我的人群</span></div>
+        <div class="kpi"><b>| &amp; ~</b><span>池内并集 · 池内交集 · 跨池排除</span></div>
+      </div>
+      <p class="lede">可操作对象是云图产品模块与卡片。未接卡片在新建页可见，脚本不写入。</p>
+      <div class="grid2">
+        <div class="card rail">
+          <h2>新建人群 · 左侧标签圈选</h2>
+          <div class="g">已有人群</div>
+          <div class="item ok"><span><i class="dot"></i>人群夹</span><span>周报 Search</span></div>
+          <div class="item ok"><span><i class="dot"></i>我的人群</span><span>差集 / 交集</span></div>
+          <div class="item off"><span><i class="dot"></i>品牌5A / SPU5A / 粉丝 / 一方上传</span></div>
+          <div class="g">触点场景圈人 · 私域</div>
+          <div class="item ok"><span><i class="dot"></i>常规投放</span></div>
+          <div class="item ok"><span><i class="dot"></i>内容营销</span></div>
+          <div class="item off"><span><i class="dot"></i>巨量千川</span></div>
+          <div class="item ok"><span><i class="dot"></i>品牌账号</span></div>
+          <div class="item ok"><span><i class="dot"></i>小店圈人</span></div>
+          <div class="item off"><span><i class="dot"></i>本品牌搜索</span></div>
+          <div class="item ok"><span><i class="dot"></i>内容圈人</span></div>
+          <div class="item ok"><span><i class="dot"></i>直播圈人</span></div>
+          <div class="item off"><span><i class="dot"></i>全民任务</span></div>
+          <div class="item ok"><span><i class="dot"></i>店铺高潜用户</span></div>
+          <div class="item off"><span><i class="dot"></i>竞价投放高潜人群</span></div>
+          <div class="g">触点场景圈人 · 公域</div>
+          <div class="item off"><span><i class="dot"></i>抖音达人</span></div>
+          <div class="item ok"><span><i class="dot"></i>全网搜索</span></div>
+          <div class="item off"><span><i class="dot"></i>触点互动偏好</span></div>
+          <div class="g">标签工厂（数据工厂页，不是左侧属性卡）</div>
+          <div class="item ok"><span><i class="dot"></i>搜索 / 内容 / 商品人群标签</span><span>建标签</span></div>
+          <div class="item ok"><span><i class="dot"></i>创建人群包</span><span>标签建出</span></div>
+          <div class="g">用户属性 · 兴趣偏好 · 行业品类兴趣</div>
+          <div class="item off"><span><i class="dot"></i>预测年龄、内容偏好、行业行为等平台预置卡</span><span>未接</span></div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <h2>标签 → 人群包</h2>
+            <p style="margin:0 0 12px;color:var(--muted);font-size:13px">周报购买包走这条链。月报内容标签算完后挂进品类包的「内容人群标签」卡，不强制再点一次创建人群包。</p>
+            <table>
+              <thead><tr><th>步骤</th><th>云图位置</th><th>页面动作</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>数据工厂 / 标签工厂 / 人群标签</td><td>新建搜索 / 内容 / 商品人群标签</td></tr>
+                <tr><td>2</td><td>同一列表行</td><td>标签生效后点「创建人群包」</td></tr>
+                <tr><td>3</td><td>人群 / 自定义分析 / 我的人群</td><td>包出现后可做交集、排除</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card" style="margin-bottom:16px">
+            <h2>顶栏与数据工厂</h2>
+            <table>
+              <thead><tr><th>路径</th><th>页面对象</th><th>控制状态</th></tr></thead>
+              <tbody>
+                <tr><td>顶栏 → 人群</td><td>自定义人群分析 → 人群列表 → 新建人群 / 详情</td><td class="yes">已接</td></tr>
+                <tr><td>顶栏 → 数据工厂</td><td>标签工厂 → 人群标签 → 搜索 / 内容 / 商品</td><td class="yes">已接</td></tr>
+                <tr><td>标签工厂列表</td><td>创建人群包（标签建出）</td><td class="yes">已接 · 周报购包</td></tr>
+                <tr><td>数据工厂</td><td>内容标签页、达人标签、自定义报表、建模预测、数据融合</td><td class="no">未接</td></tr>
+                <tr><td>顶栏其余</td><td>首页、AiMars、场景运营、GMV TO 5A、品牌心智、内容、商品、营销触点、营销决策</td><td class="no">未接</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <h2>右侧运算（新建人群）</h2>
+            <p>运算池默认一个；可「添加运算池」。池内开关为「池内取并集 / 池内取交集」。多池之间为排除。提交后覆盖人数出现在运算结果。</p>
+            <p class="src">规则字符串：<code>|</code> 并集 · <code>&amp;</code> 交集 · <code>~</code> 排除。CVR、购买交、看播交全部写成 <code>(0)&amp;(1)</code>。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="cards">
+      <p class="lede">左侧按云图模块分组。点选后看表单字段与周报、月报写入关系。</p>
+      <div class="explorer">
+        <nav class="nav-list" id="card-nav"></nav>
+        <div class="card detail" id="card-detail"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="weekly">
+      <p class="lede">阶段内并行、阶段间串行。CVR 不是填表除法，而是「我的人群」两包在运算池内取交集。</p>
+      <div class="legend">
+        <span><span class="op u">并集</span>池内取并集</span>
+        <span><span class="op i">交集</span>池内取交集 · CVR</span>
+        <span><span class="op e">排除</span>跨池排除 · 差集</span>
+        <span>金色左边线 = 非云图</span>
+      </div>
+      <div class="card">
+        <div class="swim">
+          <div class="ph"><b>阶段 1</b>串行</div>
+          <div class="row">
+            <div class="nodes">
+              <div class="node"><b>Search 无前置包</b><span>全网搜索 · 人群夹 · 直播圈人 · 小店圈人</span></div>
+            </div>
+          </div>
+          <div class="ph"><b>阶段 2</b>并行</div>
+          <div class="row">
+            <div class="para">
+              <div class="lab">三路同时提交</div>
+              <div class="nodes">
+                <div class="node"><b>关键词</b><span>公域触点 · 全网搜索</span></div>
+                <div class="node"><b>点购标签</b><span>数据工厂 · 商品人群标签 · 点击 / 购买</span></div>
+                <div class="node ext"><b>情报通抓取</b><span>nint，不经过云图模块</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="ph"><b>阶段 3–5</b>串行</div>
+          <div class="row">
+            <div class="nodes">
+              <div class="node"><b>作差购买标签</b><span>标签工厂 · 仅购买</span></div>
+              <div class="node"><b>标签建出</b><span>人群标签 → 创建人群包 → 我的人群</span></div>
+              <div class="node"><b>购包注入 Search</b><span>小店圈人 · 用户行为：商品成交</span></div>
+            </div>
+          </div>
+          <div class="ph"><b>阶段 6</b>并行</div>
+          <div class="row">
+            <div class="para">
+              <div class="lab">等覆盖人数后同时提交</div>
+              <div class="nodes">
+                <div class="node exc"><b>差集</b><span>我的人群 · 跨池排除　WTD购 − 作差购</span></div>
+                <div class="node int"><b>关键词 CVR</b><span>我的人群 · 池内取交集　搜索包 ∩ WTD购</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="ph"><b>阶段 7–8</b>串行</div>
+          <div class="row">
+            <div class="nodes">
+              <div class="node"><b>Search 进店 / 购买</b><span>小店圈人 · 直播圈人 · 已有购买包</span></div>
+              <div class="node int"><b>Search CVR</b><span>我的人群 · 池内取交集　品牌词 UV ∩ 购买</span></div>
+            </div>
+          </div>
+          <div class="ph"><b>阶段 9–10</b>串行</div>
+          <div class="row">
+            <div class="nodes">
+              <div class="node"><b>流向</b><span>小店圈人 · 商品点击（直播 / 商品卡场景）</span></div>
+              <div class="node ext"><b>填表</b><span>覆盖人数写回周报表；情报通价格带</span></div>
+            </div>
+          </div>
+        </div>
+        <p class="src">调度定义：周报总控 <code>dag.js</code>。阶段 2 <code>parallel: true</code>；阶段 6 <code>tools: ["cvr","dif"]</code> 且 <code>waitAudienceCalc</code>。</p>
+      </div>
+    </section>
+
+    <section class="panel" id="monthly">
+      <p class="lede">月报只写「数据工厂 / 人群标签 / 内容」与「自定义分析」。品类包在运算池 1 并集，跨池排除近一年成交。</p>
+      <div class="card">
+        <div class="swim">
+          <div class="ph"><b>0</b>标签</div>
+          <div class="row">
+            <div class="node"><b>内容人群标签</b><span>有效播放 / 点赞 / 评论 / 转发 · 当月与上月各一套</span></div>
+          </div>
+          <div class="ph"><b>1</b>并行</div>
+          <div class="row">
+            <div class="para">
+              <div class="lab">上月 / 当月品类可同时提交，卡片相同、日期窗不同</div>
+              <div class="nodes">
+                <div class="node"><b>品类 A3 / A2 / A1</b><span>触点并集，排除近一年小店成交</span></div>
+                <div class="node"><b>直播整体看播</b><span>直播圈人 · 按主播名称 · 看播不限次数</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="ph"><b>2</b>差集</div>
+          <div class="row">
+            <div class="node exc"><b>新增 A3 → A2 → A1</b><span>我的人群 · 跨池排除上月品类与更高意向新增</span></div>
+          </div>
+          <div class="ph"><b>3</b>并行</div>
+          <div class="row">
+            <div class="para">
+              <div class="lab">等覆盖人数后提交交集，禁止无覆盖人数抢跑</div>
+              <div class="nodes">
+                <div class="node int"><b>购买交</b><span>新增 A3 ∩ 当月购买 · 池内取交集</span></div>
+                <div class="node int"><b>看播交</b><span>整体看播 ∩ 品类/新增 A3；五间分别 ∩ 新增 A3</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h2>品类 A3 对照详情页（运算池结构）</h2>
+        <table>
+          <thead><tr><th>位置</th><th>页面运算</th><th>卡片（详情页已选标签摘要）</th></tr></thead>
+          <tbody>
+            <tr><td>运算池 1</td><td>池内取并集</td><td>品牌账号（官方账号 / 观看 / 互动）；小店圈人（商品点击、加购）；直播圈人（看播 / 互动 / 关注主播 / 送礼物）；店铺高潜用户；内容营销（星图、指定 ID、观看/互动）；内容圈人（关键词、观看/互动）；常规投放（计划 ID、曝光/点击）；内容人群标签；全网搜索</td></tr>
+            <tr><td>池间</td><td>排除</td><td>—</td></tr>
+            <tr><td>运算池 2</td><td>池内取并集</td><td>小店圈人 · 商品成交（多时间窗）</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" id="ops">
+      <p class="lede">生产路径是 Cookie 调云图接口。Chrome 只用于核验信息架构，不作为调度执行器。</p>
+      <div class="grid21">
+        <div class="card">
+          <h3>运算对照</h3>
+          <table>
+            <thead><tr><th>页面</th><th>规则</th><th>用途</th></tr></thead>
+            <tbody>
+              <tr><td>池内取并集</td><td><code>(0|1|…)</code></td><td>品类触点、Search 多条件</td></tr>
+              <tr><td>池内取交集</td><td><code>(0)&amp;(1)</code></td><td>关键词 CVR、Search CVR、购买交、看播交</td></tr>
+              <tr><td>跨池排除</td><td><code>(0)~(1)</code></td><td>周报差集、月报新增、品类减购买</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h3>调度与回传</h3>
+          <p>飞书给出周期、MG/OHC、试跑或正式、范围（标签 / 建包 / 填表）。只改 <code>config.js</code>。定时：月初建月报包；每月 10 日后情报通填表。无覆盖人数不得提交交集。</p>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+    const CARDS = [
+      {
+        id: "folder", group: "exist", name: "人群夹",
+        path: "人群 / 自定义人群分析 / 新建人群 / 已有人群 / 人群夹",
+        api: "Search 条件卡「人群夹」",
+        fields: [
+          ["选择", "已保存的人群夹"],
+          ["用途", "作为 Search 无前置包的条件之一"]
+        ],
+        weekly: "Search 无前置包写入。",
+        monthly: "不写入。"
+      },
+      {
+        id: "mine", group: "exist", name: "我的人群",
+        path: "人群 / 自定义人群分析 / 新建人群 / 已有人群 / 我的人群",
+        api: "已有人群包 ID；运算池并/交/排除",
+        fields: [
+          ["选择", "已创建人群包"],
+          ["运算", "池内取并集 / 池内取交集；添加运算池后跨池排除"]
+        ],
+        weekly: "差集：跨池排除。关键词 CVR、Search CVR：池内取交集。",
+        monthly: "新增：跨池排除。购买交、看播交：池内取交集 (0)&(1)。"
+      },
+      {
+        id: "ad", group: "touch", name: "常规投放",
+        path: "触点场景圈人 / 私域触点 / 常规投放",
+        api: "yuntu/conventionalAdV2",
+        fields: [
+          ["圈选", "指定计划 id 圈选"],
+          ["用户行为", "曝光、点击"],
+          ["时间", "行为时间"]
+        ],
+        weekly: "不写入。",
+        monthly: "品类 A3/A2/A1 按意向分档写入曝光与点击。"
+      },
+      {
+        id: "mc", group: "touch", name: "内容营销",
+        path: "触点场景圈人 / 私域触点 / 内容营销",
+        api: "yuntu/marketingContent",
+        fields: [
+          ["类型", "星图短视频营销"],
+          ["圈选", "按指定 ID 圈选"],
+          ["用户行为", "观看、互动"]
+        ],
+        weekly: "不写入。",
+        monthly: "品类触点：16 个计划 ID，观看与互动分卡。"
+      },
+      {
+        id: "brand", group: "touch", name: "品牌账号",
+        path: "触点场景圈人 / 私域触点 / 品牌账号",
+        api: "yuntu/brandPosition",
+        fields: [
+          ["圈选", "官方账号列表"],
+          ["用户行为", "观看（看完 / 有效观看）、账号互动 / 点赞"],
+          ["时间", "行为时间"]
+        ],
+        weekly: "不写入。",
+        monthly: "10 个账号；A3 看完，A2/A1 观看与点赞阈值不同。"
+      },
+      {
+        id: "shop", group: "touch", name: "小店圈人",
+        path: "触点场景圈人 / 私域触点 / 小店圈人",
+        api: "yuntu/smallShop",
+        fields: [
+          ["端", "抖音"],
+          ["品牌", "PHILIPS/飞利浦（账号绑定，不可改）"],
+          ["选择商品", "按商品名称 / 按商品 ID / 按店铺类目圈选"],
+          ["行为场景", "不限、直播场景、短视频场景、商品卡场景"],
+          ["用户行为", "商品曝光、商品点击、商品成交、商品加购"],
+          ["频次 / 时间", "不限或自定义；绝对时间"]
+        ],
+        weekly: "Search 进店与购买用点击/成交；流向用直播/商品卡场景下的商品点击。",
+        monthly: "品类：点击、加购、曝光。运算池 2：商品成交（近一年多窗）。"
+      },
+      {
+        id: "nat", group: "touch", name: "内容圈人",
+        path: "触点场景圈人 / 私域触点 / 内容圈人",
+        api: "yuntu/natureContent",
+        fields: [
+          ["圈选", "按关键词筛选内容"],
+          ["用户行为", "观看、互动"],
+          ["时间", "行为时间"]
+        ],
+        weekly: "不写入。",
+        monthly: "品类触点：关键词完播与互动。"
+      },
+      {
+        id: "live", group: "touch", name: "直播圈人",
+        path: "触点场景圈人 / 私域触点 / 直播圈人",
+        api: "yuntu/live",
+        fields: [
+          ["端", "抖音 / 今日头条 / 西瓜视频 / 抖音火山版"],
+          ["圈选类型", "按主播名称圈选 / 按直播间 id / 按时间圈选"],
+          ["直播类型", "不限 / 品牌自播 / 达人直播"],
+          ["用户行为", "看播（次数/时长）、互动、关注主播、送礼物"],
+          ["时间", "绝对时间"]
+        ],
+        weekly: "Search 进店看播。",
+        monthly: "品类 A3 五行为分卡；整体看播不限次数；看播交与五间交为交集。"
+      },
+      {
+        id: "pot", group: "touch", name: "店铺高潜用户",
+        path: "触点场景圈人 / 私域触点 / 店铺高潜用户",
+        api: "yuntu/potentialCustomers",
+        fields: [
+          ["圈选", "店铺名单"],
+          ["时间", "日期范围"]
+        ],
+        weekly: "不写入。",
+        monthly: "旗舰店 + 健康电器旗舰店，写入品类并集。"
+      },
+      {
+        id: "search", group: "public", name: "全网搜索",
+        path: "触点场景圈人 / 公域触点 / 全网搜索",
+        api: "yuntu/publicSearch",
+        fields: [
+          ["圈选", "搜索词"],
+          ["用户行为", "搜索"],
+          ["时间", "行为时间"]
+        ],
+        weekly: "关键词包；Search 品牌词 UV。",
+        monthly: "品类触点品牌词。"
+      },
+      {
+        id: "tagC", group: "tag", name: "新建内容人群标签",
+        path: "数据工厂 / 标签工厂 / 人群标签 / +人群标签 / 内容",
+        api: "dataSource=item",
+        fields: [
+          ["标签信息", "名称、描述、有效期 30–180 天、标签更新"],
+          ["用户行为", "有效播放/阅读、点赞、收藏（仅头条）、评论、转发"],
+          ["频次 / 时间", "不限或自定义；行为时间"],
+          ["匹配逻辑", "规则匹配 / 内容理解"],
+          ["匹配方式", "内容标题、视频语音、视频字幕"],
+          ["关键词池", "行内空格为与，回车为或"],
+          ["内容评估", "抖音 / 头条 / 西瓜 / 抖音火山版"]
+        ],
+        weekly: "不建内容行为标签。",
+        monthly: "播放、点赞、评论、转发；当月与上月各一套。"
+      },
+      {
+        id: "textA", group: "tag", name: "内容人群标签",
+        path: "新建人群 / 标签工厂 / 内容人群标签　或　数据工厂创建后挂入",
+        api: "yuntu/text-audience",
+        fields: [
+          ["端", "抖音等"],
+          ["选择", "已生效的内容人群标签"]
+        ],
+        weekly: "不走此卡。",
+        monthly: "品类包挂播放 / 转评 / 点赞标签。"
+      },
+      {
+        id: "tagP", group: "tag", name: "商品人群标签",
+        path: "数据工厂 / 标签工厂 / 人群标签 / 商品　→ 创建人群包后进入我的人群",
+        api: "标签工厂商品人群标签",
+        fields: [
+          ["规则", "商品名匹配"],
+          ["用户行为", "点击、购买"],
+          ["时间 / 频次", "日期窗、行为次数"]
+        ],
+        weekly: "点购标签；购买标签再点「创建人群包」建出。点击标签不建出。",
+        monthly: "不建商品标签。"
+      },
+      {
+        id: "tagS", group: "tag", name: "搜索人群标签",
+        path: "数据工厂 / 标签工厂 / 人群标签 / 搜索　以及新建人群同名卡",
+        api: "标签工厂搜索人群标签",
+        fields: [
+          ["规则", "搜索词"],
+          ["用户行为", "搜索"]
+        ],
+        weekly: "能力可用；主路径用公域「全网搜索」卡。",
+        monthly: "不作为独立工厂标签。"
+      },
+      {
+        id: "out", group: "tag", name: "创建人群包",
+        path: "数据工厂 / 标签工厂 / 人群标签列表 → 行内「创建人群包」",
+        api: "tagToAudience · 标签 ID → 人群包 ID",
+        fields: [
+          ["前置", "人群标签 status 已生效"],
+          ["动作", "创建人群包；包名沿用标签名"],
+          ["落点", "自定义分析 / 我的人群"]
+        ],
+        weekly: "只建出购买标签（WTD / 作差）。点购里的点击标签不建出。",
+        monthly: "内容标签一般不单独建出，算完后挂到品类包的「内容人群标签」卡。"
+      },
+      {
+        id: "pool", group: "op", name: "运算池",
+        path: "新建人群 / 右侧运算池",
+        api: "operation_rule",
+        fields: [
+          ["池内", "池内取并集 / 池内取交集"],
+          ["多池", "添加运算池；跨池拖拽，池间为排除"],
+          ["结果", "预估覆盖人数 / 创建人群"]
+        ],
+        weekly: "CVR 必须开池内取交集；差集必须跨池排除。",
+        monthly: "品类：池1并集排除池2成交。交包：池内取交集。"
+      }
+    ];
+    const GROUPS = [
+      ["exist", "已有人群"],
+      ["touch", "私域触点"],
+      ["public", "公域触点"],
+      ["tag", "数据工厂 / 标签工厂"],
+      ["op", "运算"]
+    ];
+    let selected = "shop";
+    function cur() {
+      return CARDS.find((c) => c.id === selected) || CARDS[0];
+    }
+    function render() {
+      const c = cur();
+      selected = c.id;
+      document.getElementById("card-nav").innerHTML = GROUPS.map(([gid, label]) => {
+        const items = CARDS.filter((x) => x.group === gid).map((x) =>
+          `<button type="button" data-id="${x.id}" class="${x.id===c.id?"on":""}">${x.name}</button>`
+        ).join("");
+        return `<div class="g">${label}</div>${items}`;
+      }).join("");
+      document.querySelectorAll("#card-nav button").forEach((b) => {
+        b.onclick = () => { selected = b.dataset.id; render(); };
+      });
+      const rows = c.fields.map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join("");
+      document.getElementById("card-detail").innerHTML =
+        `<div class="crumb">${c.path}</div>
+         <h2>${c.name}</h2>
+         <p class="api"><code>${c.api}</code></p>
+         <table class="kv">${rows}</table>
+         <div class="use">
+           <div><h3>周报</h3><p>${c.weekly}</p></div>
+           <div><h3>月报</h3><p>${c.monthly}</p></div>
+         </div>`;
+    }
+    document.getElementById("tabs").onclick = (e) => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      document.querySelectorAll(".panel").forEach((p) => p.classList.toggle("on", p.id === b.dataset.tab));
+      document.querySelectorAll("#tabs button").forEach((x) => x.classList.toggle("on", x === b));
+      if (b.dataset.tab === "cards") render();
+    };
+    render();
+  </script>
+</body>
+</html>
