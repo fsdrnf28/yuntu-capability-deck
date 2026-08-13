@@ -183,59 +183,8 @@
       .chain-head, .chain-step { grid-template-columns: 36px 1fr; }
       .chain-head span:last-child, .chain-step .box.bot { grid-column: 2; }
     }
-    .story {
-      max-width: 640px;
-      margin: 8px auto 8px;
-      padding: 8px 0 8px 8px;
-    }
-    .story .st {
-      display: grid;
-      grid-template-columns: 56px 1fr;
-      gap: 16px;
-      align-items: start;
-      position: relative;
-      padding: 0 0 28px;
-    }
-    .story .st:last-child { padding-bottom: 0; }
-    .story .st:not(:last-child)::after {
-      content: "";
-      position: absolute;
-      left: 26px;
-      top: 56px;
-      bottom: 0;
-      width: 3px;
-      background: #b7d9d1;
-      border-radius: 2px;
-    }
-    .story .numc {
-      position: relative;
-      z-index: 1;
-      width: 56px; height: 56px;
-    }
-    .story .numc span {
-      width: 56px; height: 56px; border-radius: 50%;
-      background: var(--teal); color: #fff;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px; font-weight: 700;
-      box-shadow: 0 8px 20px rgba(15,76,70,.22);
-    }
-    .story .st.start .numc span { background: var(--amber); font-size: 15px; }
-    .story .body h2 {
-      font-size: 22px; font-weight: 650; margin: 4px 0 6px; letter-spacing: .01em;
-    }
-    .story .body p {
-      margin: 0; font-size: 16px; line-height: 1.45; color: var(--ink);
-    }
-    .story .body .hint {
-      margin-top: 6px; font-size: 13px; color: var(--muted);
-    }
-    .story .chips { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
-    .story .chips em {
-      font-style: normal; font-size: 12px;
-      padding: 3px 10px; border-radius: 999px;
-    }
-    .story .chips .h { background: var(--amber-dim); color: var(--amber); }
-    .story .chips .o { background: var(--mint-dim); color: #0f6d5c; }
+    .node.hum { border-left: 3px solid var(--amber); }
+    .node.bot { border-left: 3px solid var(--mint); }
   </style>
 </head>
 <body>
@@ -450,56 +399,58 @@
     </section>
 
     <section class="panel" id="claw">
-      <p class="lede" style="max-width:640px;margin:0 auto 18px;text-align:center">以后人只在飞书说话。路只有这一条，从上往下走。</p>
-      <div class="story">
-        <div class="st start">
-          <div class="numc"><span>说</span></div>
-          <div class="body">
-            <h2>人先说要做什么</h2>
-            <p>OpenClaw 先复述一遍。人点头，才往下走。</p>
-            <div class="chips"><em class="h">人 说话、点头</em><em class="o">OpenClaw 问清楚</em></div>
-          </div>
-        </div>
-        <div class="st">
-          <div class="numc"><span>1</span></div>
-          <div class="body">
-            <h2>一起改一小块</h2>
-            <p>对着已经会跑的样子，只改这一块。人看对不对。</p>
-            <p class="hint">还不是整条任务。</p>
-            <div class="chips"><em class="h">人 拍板这一块</em><em class="o">OpenClaw 改这一块</em></div>
-          </div>
-        </div>
-        <div class="st">
-          <div class="numc"><span>2</span></div>
-          <div class="body">
-            <h2>它自己排好多块</h2>
-            <p>哪些一起做、哪些要等前一块做完，OpenClaw 自己画图。人只看这张图对不对。</p>
-            <p class="hint">Deep Engineer · 人数没出来，不准做下一步。</p>
-            <div class="chips"><em class="h">人 确认图</em><em class="o">OpenClaw 自己排</em></div>
-          </div>
-        </div>
-        <div class="st">
-          <div class="numc"><span>3</span></div>
-          <div class="body">
-            <h2>设成闹钟</h2>
-            <p>图画对了，就到点自己跑。坏了只来问人，不自己乱写。</p>
-            <div class="chips"><em class="h">人 说几点跑</em><em class="o">OpenClaw 到点跑</em></div>
-          </div>
-        </div>
-        <div class="st">
-          <div class="numc"><span>4</span></div>
-          <div class="body">
-            <h2>两样一起交给人</h2>
-            <p>底数一份，说法一份，放在同一条飞书里。少一样就不算交完。</p>
-            <p class="hint">原数据 + 分析结论。</p>
-            <div class="chips"><em class="h">人 收回两样</em><em class="o">OpenClaw 一起发出</em></div>
-          </div>
-        </div>
+      <p class="lede">代码上服务器后，业务需求经飞书发给 OpenClaw。确认后按阶段执行，不得跳步。</p>
+      <div class="legend">
+        <span><span class="op i">人</span>橙色左边线</span>
+        <span><span class="op u">OpenClaw</span>绿色左边线</span>
+        <span>虚线框 = 该阶段内部并行</span>
       </div>
-      <p class="src" style="max-width:640px;margin:20px auto 0;text-align:center">第 1–3 步怎么写给它，见「指令与材料」。第 4 步收回什么，见「原数据与分析」。</p>
+      <div class="card">
+        <div class="swim">
+          <div class="ph"><b>阶段 0</b>确认</div>
+          <div class="row">
+            <div class="nodes">
+              <div class="node hum"><b>飞书发送需求</b><span>品类、周期、试跑或正式、范围。可半句，可附词表</span></div>
+              <div class="node bot"><b>回传确认卡</b><span>缺参不猜。未确认不得写入云图</span></div>
+            </div>
+          </div>
+          <div class="ph"><b>阶段 1</b>单模块</div>
+          <div class="row">
+            <div class="nodes">
+              <div class="node hum"><b>确认改法</b><span>只改哪一个功能模块</span></div>
+              <div class="node bot"><b>改写样例代码</b><span>复制已跑通模块，只改这一处并试跑。本阶段不编排整条链路</span></div>
+            </div>
+          </div>
+          <div class="ph"><b>阶段 2</b>Deep Engineer</div>
+          <div class="row">
+            <div class="para">
+              <div class="lab">自行设计多功能串联与并发</div>
+              <div class="nodes">
+                <div class="node hum"><b>确认步骤图</b><span>谁并行、谁等待覆盖人数</span></div>
+                <div class="node bot"><b>编排 DAG</b><span>无依赖并行；有前置则串行；无覆盖人数不得提交交集</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="ph"><b>阶段 3</b>定时</div>
+          <div class="row">
+            <div class="nodes">
+              <div class="node hum"><b>确认触发周期</b><span>周报周期结束、月初月报、每月 10 日后情报通；是否免确认</span></div>
+              <div class="node bot"><b>写入定时任务</b><span>调用已通过的 DAG。失败停写并询问，不擅自写云图</span></div>
+            </div>
+          </div>
+          <div class="ph"><b>阶段 4</b>交付</div>
+          <div class="row">
+            <div class="nodes">
+              <div class="node hum"><b>分析问题</b><span>可空。有则按原话切片，不另起口径</span></div>
+              <div class="node bot"><b>原数据 + 分析结论</b><span>覆盖人数齐备后，同一条飞书送达。缺一则未交付</span></div>
+            </div>
+          </div>
+        </div>
+        <p class="src">阶段 1–3 的飞书指令见「指令与材料」。阶段 4 的回传内容见「原数据与分析」。周报 / 月报现有代码是阶段 1–2 的样例。</p>
+      </div>
     </section>
     <section class="panel" id="talk">
-      <p class="lede">飞书句子按主线拆开用：①改单功能、②设计 DAG、③配定时、日常喊已有能力。不要把四段写进同一条。</p>
+      <p class="lede">按阶段复制飞书指令：改写单模块、编排 DAG、配置定时、日常执行已有能力。四段不要写进同一条消息。</p>
       <div class="card" style="margin-bottom:16px">
         <h2>每次都用的句子骨架</h2>
         <div class="say">任务：&lt;下面左侧的功能名&gt;
