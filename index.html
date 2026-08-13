@@ -430,6 +430,22 @@
         </div>
         <p class="src">约束来自既有决策：生产路径必须是 <code>config.js</code> + 脚本，不能把本机 Chrome MCP 当执行器。服务器上没有本人浏览器。</p>
       </div>
+      <div class="card" style="margin-bottom:16px">
+        <h2>业务需求怎么发到飞书 OpenClaw</h2>
+        <p>代码上服务器之后，人不再 SSH、不再双击 <code>.command</code>。需求只走飞书：绑定群或与 Bot 单聊发一条消息，OpenClaw 在服务器上收事件、对 skill、回确认卡。</p>
+        <table>
+          <thead><tr><th>怎么发</th><th>做法</th><th>OpenClaw 收到什么</th></tr></thead>
+          <tbody>
+            <tr><td>日常跑已有功能</td><td>在绑定群 @Bot，或单聊。第一句写任务名（见「怎么对 OpenClaw 说话」）</td><td>文本槽位；Excel / 词表 / 主播名单作附件</td></tr>
+            <tr><td>Cookie、密钥</td><td>只走密聊，不进群、不进 git</td><td>写入 <code>.yuntu_cookie.local</code></td></tr>
+            <tr><td>新功能（现有 skill 不够）</td><td>群里说要做什么，并指明「按现有样例改」</td><td>进入 Deep Engineer：认样例 → 改一处 → 再出确认卡</td></tr>
+            <tr><td>半句话也可以</td><td>例如「跑上周 MG 周报」</td><td>必须回确认卡补齐周期 / 标识词 / 写云图，等「确认」</td></tr>
+          </tbody>
+        </table>
+        <div class="say">@OpenClaw 跑飞利浦上周周报，MG 和 OHC，正式，写云图。
+（半句即可。Bot 必须回确认卡，不要直接 POST 云图。）</div>
+        <p class="src">形态对齐已交付过的 OpenClaw 包：怡丽丝尔是「解压 → 改路径 → 只改 config → 跑 command」；达人优选是「拷 skill 到 OPENCLAW_SKILLS_DIR → 飞书带 Brief → 先出落地卡再执行」。飞利浦周报/月报沿用同一入口，不另做控制台。</p>
+      </div>
       <div class="grid21" style="margin-bottom:16px">
         <div class="card">
           <h3>OpenClaw 必须问清的槽位</h3>
@@ -471,6 +487,122 @@
             <tr><td>服务器定时</td><td class="no">待建</td><td>周报周期触发；月初月报；每月 10 日后情报通</td></tr>
           </tbody>
         </table>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h2>现在（代码）→ 以后（服务器 + 飞书）</h2>
+        <table>
+          <thead><tr><th></th><th>现在</th><th>放到服务器之后</th></tr></thead>
+          <tbody>
+            <tr><td>谁触发</td><td>人改 <code>config.js</code>，双击 <code>开始.command</code></td><td>人在飞书说话，OpenClaw 触发同一套脚本</td></tr>
+            <tr><td>代码位置</td><td>本机「飞利浦报表」「飞利浦月报」</td><td>服务器固定路径；工程当样例，不在对话里重写整仓</td></tr>
+            <tr><td>认证</td><td>Cookie 文件；开发期可用 Chrome 刷新</td><td>只认 Cookie 文件。MCP / 本人浏览器不进生产</td></tr>
+            <tr><td>需求怎么进</td><td>口头或改配置字段</td><td>飞书消息 → OpenClaw 填槽位 → <b>确认卡</b>回传 → 用户回「确认」才执行</td></tr>
+            <tr><td>能力不够时</td><td>人改子工具 / <code>dag.js</code></td><td>Deep Engineer 复制样例模块、改一处、封成新 skill，再挂进 DAG</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h2>OpenClaw 自己确认需求（确认卡）</h2>
+        <p>用户可以只发半句话。OpenClaw 必须先回一张确认卡，等「确认」再写配置、再跑命令。猜日期、猜写云图，都不允许。</p>
+        <div class="say">任务：周报主链路
+品类：MG + OHC
+周期：2026-08-03 ~ 2026-08-09（交付 0809）
+标识词：空（正式）
+写云图：是
+将执行：开始.command → dag.js 阶段1–10；未齐则值守完成.command
+将改文件：周报总控/config.js 仅 weekStart/weekEnd/deliveryTag/nameRunMark
+请回复「确认」或指出要改的槽位。</div>
+        <div class="num"><i>1</i><p><b>能对上已有 skill</b>只改配置，不改代码。对应「怎么对 OpenClaw 说话」里每一个功能。</p></div>
+        <div class="num"><i>2</i><p><b>对不上</b>进入 Deep Engineer：说明将复制哪份样例、改哪几个文件、新 skill 名字、DAG 哪一阶段并行。再等第二次「确认」。</p></div>
+        <div class="num"><i>3</i><p><b>执行中</b>飞书只报阶段与阻塞（标签计算中、无 cover 未提交交集）。不把 MCP 点云图当进度。</p></div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h2>样例代码 → 改一处 → 封成 OpenClaw skill</h2>
+        <p>Deep Engineer 禁止空仓生成。样例就是已经跑通的子工具。历史先例：作差工具从标签工厂复制后只留购买；月报 A2 从 A3 学包后剥掉「排除新增」。</p>
+        <table>
+          <thead><tr><th>新需求举例</th><th>样例（只读复制）</th><th>允许改的一处</th><th>封成的 skill</th></tr></thead>
+          <tbody>
+            <tr><td>只要购买、不要点击的第二套标签</td><td><code>标签工厂建包/</code></td><td>行为只留购买；段码写死</td><td><code>philips-tag-diff</code>（已有形态：标签工厂-作差）</td></tr>
+            <tr><td>新的交包配对</td><td><code>人群包交集-对应/</code> + <code>prepare_cvr_input.py</code></td><td>A/B 包匹配规则、结果包名</td><td><code>philips-cvr-*</code></td></tr>
+            <tr><td>新的差集定义</td><td><code>人群包差集-对应/</code> + <code>prepare_dif_input.py</code></td><td>被减数 / 减数、结果名</td><td><code>philips-dif-*</code></td></tr>
+            <tr><td>月报多一档意向</td><td><code>templates/fixed_templates.json</code> 的品类 A3</td><td>触点阈值、运算规则</td><td>月报流水线多一个 key</td></tr>
+            <tr><td>只要段码、不要交差集</td><td><code>开始.command</code> 编排</td><td>关掉 cvr / dif / 建出 / SV</td><td>已有形态：不需运算数据</td></tr>
+          </tbody>
+        </table>
+        <p class="src">封 skill 的标准动作：复制样例目录 → 改配置字段与最少代码 → dry-run 不写云图 → 用户确认 → 写入 OpenClaw skills 目录 → 在「怎么对 OpenClaw 说话」增加一条话术。</p>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h2>Deep Engineer 自己设计并发 DAG</h2>
+        <p>样例是周报 <code>dag.js</code>：阶段内 <code>parallel: true</code>，阶段间 <code>requires</code> / <code>requiresAny</code>，交包前 <code>waitAudienceCalc</code>。新 DAG 必须沿用这三条，不能把 CVR 放到购买包 cover 出现之前。</p>
+        <table>
+          <thead><tr><th>规则</th><th>样例（已在生产）</th><th>Deep Engineer 生成时必须写上</th></tr></thead>
+          <tbody>
+            <tr><td>无依赖可并行</td><td>阶段2：关键词 \|\| 点购标签 \|\| 情报通</td><td><code>parallel: true</code> + tools 列表</td></tr>
+            <tr><td>硬前置</td><td>作差 requires 点购标签</td><td><code>requires: ["tagFactory"]</code></td></tr>
+            <tr><td>任一前置</td><td>建出 requiresAny 点购或作差</td><td><code>requiresAny</code></td></tr>
+            <tr><td>等人群算完再交</td><td>阶段6 CVR 与差集并行，waitAudienceCalc</td><td>无 cover 不得 POST 交集</td></tr>
+            <tr><td>晚段等早段</td><td>Search 进店 requires Early + 购注入</td><td><code>waitSvKinds: ["base","overall"]</code></td></tr>
+          </tbody>
+        </table>
+        <p class="src">月报同构：标签就绪 → 品类并行 → 新增差集 → 购买交 \|\| 看播交。Deep Engineer 若加「新品类交包」，应挂在新增 cover 之后并行，而不是插进标签未齐的阶段。</p>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h2>自动配成定时任务</h2>
+        <p>OpenClaw 在 skill 部署成功后写入 cron。触发失败（Cookie 过期、缺参）只发飞书，不写云图。人不必每周再发「开始跑」；定时触发后仍先发确认卡（写云图=是的任务），除非用户事先声明「以后这类正式跑无需再确认」。</p>
+        <table>
+          <thead><tr><th>任务</th><th>何时</th><th>调用</th><th>失败怎么问用户</th></tr></thead>
+          <tbody>
+            <tr><td>不需运算线</td><td>周报周期锁定后、主链路前</td><td><code>开始-不需运算数据.command</code></td><td>去年日期未手写则停</td></tr>
+            <tr><td>周报主链路</td><td>weekEnd 次日或约定周一</td><td><code>开始.command</code> → 未齐则 <code>值守完成.command</code></td><td>Cookie 失效则密聊要新 Cookie</td></tr>
+            <tr><td>月报建包</td><td>每月 1 日先 dry-run，确认后正式</td><td><code>run_monthly_pipeline.py</code></td><td>未确认不得 createEnabled=true</td></tr>
+            <tr><td>情报通填表</td><td>每月 10 日及之后</td><td>情报通旁路</td><td>平台未出数则只报「未出」</td></tr>
+            <tr><td>分析回传</td><td>check_latest 必填缺=0 之后</td><td>分析 skill</td><td>仍缺 cover 则只发原数据状态</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h2>新需求从飞书到新 skill 的整条链</h2>
+        <div class="swim">
+          <div class="ph"><b>1</b>飞书</div>
+          <div class="row">
+            <div class="node"><b>业务需求原文</b><span>人把要做的事发到绑定群。可半句，可附样表。不进云图后台，不 SSH 改代码。</span></div>
+          </div>
+          <div class="ph"><b>2</b>确认</div>
+          <div class="row">
+            <div class="node"><b>OpenClaw 自己确认</b><span>解析任务名 / 品类 / 周期 / 写云图。对得上已有 skill 就出运行确认卡；对不上就声明将复制哪份样例、改哪几个文件。</span></div>
+          </div>
+          <div class="ph"><b>3</b>改样例</div>
+          <div class="row">
+            <div class="para">
+              <div class="lab">Deep Engineer · 只改单模块，禁止空仓生成</div>
+              <div class="nodes">
+                <div class="node"><b>复制样例</b><span>标签工厂 / 交集 / 差集 / dag.js / 月报流水线</span></div>
+                <div class="node"><b>改一处</b><span>行为、配对、阈值、或关掉某段</span></div>
+                <div class="node"><b>dry-run</b><span>不写云图，把将生成的包名发回飞书</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="ph"><b>4</b>DAG</div>
+          <div class="row">
+            <div class="node"><b>自己设计串联 / 并发</b><span>无依赖 parallel；硬前置 requires；交包前 waitAudienceCalc。样例就是周报 dag.js 与月报 0→5。</span></div>
+          </div>
+          <div class="ph"><b>5</b>部署</div>
+          <div class="row">
+            <div class="nodes">
+              <div class="node"><b>封 skill</b><span>拷到服务器 OPENCLAW_SKILLS_DIR；话术写入「怎么对 OpenClaw 说话」</span></div>
+              <div class="node"><b>配定时</b><span>cron 调同一 command；失败只飞书、不写云图</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="say">任务：新需求改样例并封 skill
+要做：只要购买、不要点击的第二套标签（已有形态：标签工厂-作差）
+样例：飞利浦报表 / 标签工厂建包/
+改动：行为只留购买；段码写死
+DAG：挂在点购标签之后，与关键词并行
+定时：不要 / 或写 cron 表达式
+写云图：否（先 dry-run）
+请先出确认卡：将复制的目录、将改的文件、新 skill 名、dry-run 包名。</div>
+        <p class="src">用户回「确认」后才改文件、才拷 skill、才写 cron。第二次确认（写云图=是）才允许 POST。</p>
       </div>
     </section>
 
@@ -589,7 +721,67 @@
         <div class="num"><i>1</i><p><b>飞书正文</b>可执行结论不超过五条；未齐项单独列表。</p></div>
         <div class="num"><i>2</i><p><b>附件包</b>填数表 / 核对表、pipeline JSON、人群包与标签名单（名、ID、cover、状态）。</p></div>
         <div class="num"><i>3</i><p><b>分析件</b>飞书文档或 HTML，每条判断标注所用包名与 cover。原数据与分析必须同时送达。</p></div>
-        <p class="src">分析 skill 待建；取数与填表已有。OpenClaw 在 cover 未齐时只回传原数据状态，不出分析结论。</p>
+        <p class="src">OpenClaw 分析 skill 待建；取数与填表已有。OpenClaw 在 cover 未齐时只回传原数据状态，不出分析结论。</p>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h2>报告怎么从两个输入写出来</h2>
+        <p>全部做完之后，分析 skill 只读原数据，不重算云图口径。用户需求是切片指令，不是另开一套数。</p>
+        <div class="num"><i>1</i><p><b>判定齐数</b>周报看 <code>check_latest.json</code> 必填缺=0；月报看标签 status=3 且交包有 cover。未齐只发状态，不写结论。</p></div>
+        <div class="num"><i>2</i><p><b>打包原数据</b>填数表、核对表、包名单（名 / ID / cover / 运算规则）、<code>pipeline_summary</code>。这是底，一份也不能少。</p></div>
+        <div class="num"><i>3</i><p><b>读用户需求</b>飞书里的分析问题。没有加问就出标准切片（周报：UV / 进店 / 购 / Search CVR / 流向 / 价格带；月报：品类 / 新增 / 购买交 / 看播交）。</p></div>
+        <div class="num"><i>4</i><p><b>每条结论必须能指回一行原数据</b>写包名、人群包 ID、cover、运算（并 / 交 / 排除）。CVR 用交集包人数，不用表内相除。</p></div>
+        <div class="num"><i>5</i><p><b>同一条飞书发给用户</b>正文 + 原数据.zip + 分析件。拆开发视为未完成。</p></div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h2>什么叫「全部做完」</h2>
+        <p>分析不得在流水线中途写。完成判定用工程里已经在用的检查，而不是「脚本退出码 0」。</p>
+        <table>
+          <thead><tr><th>线</th><th>完成条件</th><th>未完成时</th></tr></thead>
+          <tbody>
+            <tr><td>周报主链路</td><td><code>check_latest.json</code> 必填缺=0；CVR/差集包有 cover</td><td>值守继续；分析 skill 不跑</td></tr>
+            <tr><td>不需运算线</td><td>YTD/QTD/MTD/LY* 关键词与点购已填格；不要求 CVR</td><td>只续跑该线</td></tr>
+            <tr><td>月报</td><td>内容标签 status=3；品类/新增/交包已生效且有 cover</td><td>交包禁止抢跑；分析只列阻塞包名</td></tr>
+            <tr><td>情报通</td><td>10 日后有价格带或明确「平台未出」</td><td>分析里价格带标未出，不编造</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h2>分析有两个输入：原数据 × 用户需求</h2>
+        <p>原数据是底。用户需求决定切哪几刀。没有用户问题就出标准切片；有问题必须能指回某一行 cover，不能另起口径。</p>
+        <table>
+          <thead><tr><th>用户需求（飞书原话举例）</th><th>必须引用的原数据</th><th>分析里要写清的关系</th></tr></thead>
+          <tbody>
+            <tr><td>飞利浦这周搜索转化怎么样</td><td>品牌词 UV cover、品牌搜索词 cvr cover（UV ∩ WTD购）</td><td>CVR 用交集包人数，不用表内相除</td></tr>
+            <tr><td>新客购买有多少</td><td>差集包「新客…购」cover（WTD购 − 做差购）</td><td>跨池排除后的人数</td></tr>
+            <tr><td>进店里直播和商品卡谁多</td><td>流向两个小店点击包 cover</td><td>场景拆分来自小店圈人行为场景</td></tr>
+            <tr><td>7 月品类盘了多少、新增多少</td><td>品类 A3 cover、新增 A3 cover</td><td>品类=触点并集 − 近一年成交</td></tr>
+            <tr><td>哪个直播间更吃新增 A3</td><td>五间看播交 cover（直播圈人 ∩ 新增A3）</td><td>各间分别交集，不是加总估算</td></tr>
+            <tr><td>价格带和搜索对不上</td><td>周报表 Search 格 + 情报通价格带</td><td>情报通非云图；10 日前允许未出</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h2>原数据从哪里打包（已有路径）</h2>
+        <table>
+          <thead><tr><th>包内文件</th><th>真实位置</th></tr></thead>
+          <tbody>
+            <tr><td>周报填数表、核对表</td><td><code>飞利浦报表/自动填表/周报填表/weeks/&lt;周Id&gt;/</code>；核对表 <code>周报总控/核对/包名核对-OHC|MG类目.xlsx</code></td></tr>
+            <tr><td>缺项检查</td><td><code>…/reports/check_latest.json</code></td></tr>
+            <tr><td>建出 / CVR / 差集登记</td><td>各子工具 <code>创建结果/</code>、<code>tag_to_audience_plan.json</code>、<code>dif_pair_plan.json</code></td></tr>
+            <tr><td>月报摘要</td><td><code>飞利浦月报/results/pipeline_summary_*.json</code> 与日志</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h2>同一条飞书消息里怎么给用户</h2>
+        <div class="say">【状态】周报 0809 必填缺=0 / 月报 7月 交包仍等 cover（列出包名）
+【分析】1. …（引用：品牌词UV id=… cover=… ∩ WTD购 id=… → 搜索词cvr cover=…）
+2. …
+【未齐】… 标计算中，无估算
+【附件】原数据.zip（填数表、核对表、check_latest、包名单 csv）
+【附件】分析.md 或飞书文档链接
+两条附件必须同时出现。只发分析、不发原数据，视为未完成。</div>
+        <p class="src">「用户」= 飞书里提需求的人。若要转给飞利浦看数同事，转发这一整条，禁止只转分析。OpenClaw 默认回绑定群；要指定接收人时在任务里写「发给某某」。</p>
       </div>
     </section>
   </div>
@@ -952,6 +1144,21 @@
         need: "pipeline_summary 或允许先查云图 cover。",
         does: "按包名取 cover 写分析。",
         back: "结论、包名单、未齐项。" },
+      { id: "a-ask", g: "分析", name: "按用户问题分析",
+        say: "任务：按问题分析\n周期：0809 或 7月\n问题：<把用户原话贴在这里>\n请先确认已全部做完。每条结论引用包名、ID、cover、运算。原数据.zip 和分析同一条消息发我，不要拆开。",
+        need: "用户分析问题原文。对应周/月必须已齐数，或允许只回未齐清单。",
+        does: "对齐数检查 → 打包原数据 → 按问题切片 → 结论全部指回 cover。",
+        back: "同一条飞书：状态 + 分析 + 原数据附件 + 分析件。" },
+      { id: "x-skill", g: "扩展", name: "新需求改样例封 skill",
+        say: "任务：新需求改样例并封 skill\n要做：<一句话说清>\n样例：请按最像的现有子工具复制（例如标签工厂建包 / 人群包交集-对应 / dag.js）\n改动：只改一处\nDAG：写清挂在哪一阶段、是否并行\n定时：不要 / 或 cron\n写云图：否（先 dry-run）\n请先出确认卡，不要直接改文件。",
+        need: "新需求原话；指出最像哪条已有功能。工程已在服务器路径上。",
+        does: "Deep Engineer 复制样例、改最少代码、dry-run 出包名、用户确认后拷到 OPENCLAW_SKILLS_DIR。",
+        back: "将改文件、新 skill 名、dry-run 包名、是否写 cron。" },
+      { id: "x-cron", g: "扩展", name: "配定时任务",
+        say: "任务：配定时\n对象：周报主链路 / 不需运算 / 月报 dry-run / 情报通 / 分析回传\n触发：weekEnd 次日 / 每月1日 / 每月10日 等\n写云图：正式任务仍先发确认卡，除非我声明以后免确认\nCookie 失效只飞书问我，不要写云图。",
+        need: "要定时的任务名、时区、是否免确认。",
+        does: "写入 cron，调用已有 command / pipeline，失败停写。",
+        back: "cron 表达式、下次触发时间、失败时飞书问什么。" },
       { id: "d-live", g: "改卡", name: "改直播主播",
         say: "任务：改直播圈人主播名单\n月报 config.liveAnchors 换成附件 ID\n先 dry-run 给我看包名变化，确认后再写云图。",
         need: "主播名称 + 云图账号 ID 表。说明要改月报还是周报 Search 进店。",
@@ -963,7 +1170,7 @@
         does: "改词包配置，不改卡片类型。",
         back: "新旧词数量、将重建哪些标签/包。" }
     ];
-    const TALK_GROUPS = [["一次","一次性"],["周报","周报"],["月报","月报"],["分析","分析"],["改卡","改卡片参数"]];
+    const TALK_GROUPS = [["一次","一次性"],["周报","周报"],["月报","月报"],["分析","分析"],["扩展","扩展"],["改卡","改卡片参数"]];
     let talkId = "w-full";
     function talkCur() { return TALKS.find((t) => t.id === talkId) || TALKS[0]; }
     function renderTalk() {
