@@ -200,7 +200,6 @@
       <button data-tab="cards">卡片与字段</button>
       <button data-tab="weekly">周报拓扑</button>
       <button data-tab="monthly">月报拓扑</button>
-      <button data-tab="ops">运算与交付</button>
       <button class="pri" data-tab="claw">飞书 OpenClaw</button>
       <button class="pri" data-tab="talk">指令与材料</button>
       <button class="pri" data-tab="analysis">原数据与分析</button>
@@ -394,27 +393,6 @@
             <tr><td>运算池 2</td><td>池内取并集</td><td>小店圈人 · 商品成交（多时间窗）</td></tr>
           </tbody>
         </table>
-      </div>
-    </section>
-
-    <section class="panel" id="ops">
-      <p class="lede">生产路径是 Cookie 调云图接口。Chrome 只用于核验信息架构，不作为调度执行器。</p>
-      <div class="grid21">
-        <div class="card">
-          <h3>运算对照</h3>
-          <table>
-            <thead><tr><th>页面</th><th>规则</th><th>用途</th></tr></thead>
-            <tbody>
-              <tr><td>池内取并集</td><td><code>(0|1|…)</code></td><td>品类触点、Search 多条件</td></tr>
-              <tr><td>池内取交集</td><td><code>(0)&amp;(1)</code></td><td>关键词 CVR、Search CVR、购买交、看播交</td></tr>
-              <tr><td>跨池排除</td><td><code>(0)~(1)</code></td><td>周报差集、月报新增、品类减购买</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="card">
-          <h3>调度与回传</h3>
-          <p>飞书给出周期、MG/OHC、试跑或正式、范围（标签 / 建包 / 填表）。只改 <code>config.js</code>。定时：月初建月报包；每月 10 日后情报通填表。无覆盖人数不得提交交集。</p>
-        </div>
       </div>
     </section>
 
