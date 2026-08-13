@@ -138,7 +138,12 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 12px; font-weight: 650; margin-top: 2px;
     }
-    .num p { margin: 0; }
+    .say {
+      background: #102924; color: #e7faf4;
+      padding: 12px 14px; border-radius: 10px;
+      font-size: 12.5px; white-space: pre-wrap; line-height: 1.55;
+      margin: 0 0 14px; font-family: ui-monospace, Menlo, monospace;
+    }
     .num b { display: block; }
     @media (max-width: 980px) {
       .grid3 { grid-template-columns: 1fr; }
@@ -162,6 +167,7 @@
       <button data-tab="monthly">月报拓扑</button>
       <button data-tab="ops">运算与交付</button>
       <button class="pri" data-tab="claw">飞书 OpenClaw</button>
+      <button class="pri" data-tab="talk">怎么对 OpenClaw 说话</button>
       <button class="pri" data-tab="analysis">原数据与分析</button>
     </div>
 
@@ -465,6 +471,43 @@
             <tr><td>服务器定时</td><td class="no">待建</td><td>周报周期触发；月初月报；每月 10 日后情报通</td></tr>
           </tbody>
         </table>
+      </div>
+    </section>
+
+    <section class="panel" id="talk">
+      <p class="lede">飞书里复制对应话术，按清单附材料。OpenClaw 只改 <code>config.js</code> 再跑脚本。缺槽位必须回问，不得猜去年日期，不得在未确认时写云图。</p>
+      <div class="card" style="margin-bottom:16px">
+        <h2>每次都用的句子骨架</h2>
+        <div class="say">任务：&lt;下面左侧的功能名&gt;
+品类：MG / OHC / 两者都要
+周期：YYYY-MM-DD 至 YYYY-MM-DD
+交付标签：0809（周报）或 7月（月报）
+标识词：空（正式）或 测
+写云图：否（只演练） / 是（正式创建）
+范围：按该功能默认；若只要其中一步请写明
+附件：见该功能「要给的材料」</div>
+        <p class="src">第一句写任务名，OpenClaw 才知道跑哪条 command。不要只说「帮我跑一下周报」。</p>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <h2>第一次部署必须给齐</h2>
+        <table>
+          <thead><tr><th>材料</th><th>给法</th><th>用途</th></tr></thead>
+          <tbody>
+            <tr><td>飞利浦报表工程</td><td>压缩包或服务器路径。排除 <code>.yuntu_cookie.local</code>、<code>logs/</code></td><td>周报总控 + 子工具</td></tr>
+            <tr><td>飞利浦月报工程</td><td>同上，排除 Cookie 与日志</td><td>月报流水线 + 模板</td></tr>
+            <tr><td>云图 Cookie</td><td>飞书密聊发字符串或文件，写入 <code>.yuntu_cookie.local</code>，禁止进 git</td><td>建标签 / 建包 / 取数</td></tr>
+            <tr><td>情报通 Cookie</td><td>要价格带时再给；密聊</td><td>nint 抓取与填表</td></tr>
+            <tr><td>周报底表</td><td><code>底表/飞利浦DY周度-OHC类目.xlsx</code>、<code>…-MG类目.xlsx</code></td><td>填表与核对表版式</td></tr>
+            <tr><td>月报参考表</td><td><code>参考表-ISV抖音MG-月度数据监控0810.xlsx</code></td><td>口径对照，不当运行配置</td></tr>
+            <tr><td>本手册</td><td>本页或「云图能力汇总」文件夹</td><td>OpenClaw 按功能对槽位</td></tr>
+          </tbody>
+        </table>
+        <p class="src">部署完成后日常不必再发包。Cookie 过期只重发 Cookie。词包、主播、计划 ID 有变时，按对应功能再附名单。</p>
+      </div>
+      <p class="lede" style="margin-top:8px">点左侧功能，复制话术。日期请改成当次真实周期。</p>
+      <div class="explorer">
+        <nav class="nav-list" id="talk-nav"></nav>
+        <div class="card detail" id="talk-detail"></div>
       </div>
     </section>
 
@@ -783,12 +826,177 @@
            <div><h3>月报</h3><p>${c.monthly}</p></div>
          </div>`;
     }
+    const TALKS = [
+      { id: "deploy", g: "一次", name: "首次部署",
+        say: "任务：首次部署飞利浦周报+月报 OpenClaw\n服务器路径：请写成你解压后的绝对路径\n云图 Cookie：下一条密聊发送\n情报通 Cookie：若本周要价格带则一并密聊\n写云图：否\n请校准 projectRoot / cookieFile 后做 dry-run，把结果发我。",
+        need: "① 飞利浦报表压缩包（无 Cookie、无 logs）② 飞利浦月报压缩包（无 Cookie、无 logs）③ 云图 Cookie 密聊 ④ 周报 OHC/MG 底表 ⑤ 可选：情报通 Cookie、月报参考表",
+        does: "改绝对路径；写入 Cookie 文件；sync 配置；周报与月报各跑一次 dry-run，不 POST 云图。",
+        back: "路径是否可读、Cookie 是否登录通过、dry-run 摘要。缺哪份材料一次列清。" },
+      { id: "cookie", g: "一次", name: "更新 Cookie",
+        say: "任务：更新云图 Cookie\n账号：PHILIPS/飞利浦 品牌版\nCookie：见密聊附件或下一段文本\n请写入 .yuntu_cookie.local 后做登录校验，不要提交 git。",
+        need: "最新云图 Cookie 字符串或文件。若还要情报通，另发 nint Cookie。",
+        does: "覆盖 Cookie 文件并校验登录（brand_id / aadvid）。",
+        back: "登录通过或失败原因。失败则停，不跑建包。" },
+      { id: "w-full", g: "周报", name: "主链路全跑",
+        say: "任务：周报主链路\n品类：MG 和 OHC\n周期：2026-08-03 至 2026-08-09\n交付标签：0809\n标识词：空\n写云图：是\n范围：Search无前置 + 关键词 + 点购标签 + 作差 + 建出购买 + CVR + 差集 + Search进店购买 + Search CVR + 流向 + 填表\n未齐则值守到齐。",
+        need: "有效云图 Cookie。底表已在工程内则不必再附。标识词若正式必须说「空」，不要沿用上次「测」。",
+        does: "改 weekStart/weekEnd/deliveryTag/nameRunMark；跑 开始.command 对应编排；按 dag.js 并行/串行。",
+        back: "填数表、核对表、未齐包名单、失败标签。Cover 未出的 CVR 不得提交。" },
+      { id: "w-watch", g: "周报", name: "值守到齐",
+        say: "任务：周报值守到齐\n周期：同上一批\n品类：MG 和 OHC\n写云图：是（只补未完成步骤）\n请循环补建出 / CVR / 差集 / Search 晚段 / 流向 / 填表，直到必填缺=0 或确认卡住。",
+        need: "说明是接上一次哪周（交付标签）。不必重发包。",
+        does: "跑 值守完成.command：补跑缺步 → 取数填表 → run_check。",
+        back: "缺项从哪些变成 0；若卡住，列出缺包 / 有包无数 / 标签计算失败。" },
+      { id: "w-noy", g: "周报", name: "不需运算数据",
+        say: "任务：不需运算数据\n品类：MG 和 OHC\n今年：YTD 2026-01-01~2026-08-09；QTD …；MTD …\n去年：LYTD / LQTD / LMTD / LWTD 日期如下（手写，勿自动推）：\nLYTD：…\n范围：关键词 + 点购标签 + 情报通；不要 CVR、不要差集、不要建出、不要 Search、不要流向\n写云图：是\n填到同一张周报表的去年/YTD/QTD/MTD 格子。",
+        need: "去年四段日期必须手写。云图 Cookie。情报通若要填价格带则给 nint Cookie。",
+        does: "改 config-不需运算数据.js；跑 开始-不需运算数据.command。标签不建出。",
+        back: "这些段码的包名、覆盖人数、填表格子。不提示 CVR 未做。" },
+      { id: "w-cont", g: "周报", name: "继续取数",
+        say: "任务：周报继续取数\n周期：接 0809 这一批\n请不要重新建已有包，只取已生效包的覆盖人数并填表。",
+        need: "交付标签或 weekStart/weekEnd。Cookie 仍有效。",
+        does: "跑 继续取数.command。",
+        back: "新填上的格子；仍缺的指标及原因（缺包 / 有包无数）。" },
+      { id: "w-kw", g: "周报", name: "只建关键词包",
+        say: "任务：只建关键词人群包\n品类：MG 和 OHC\n周期：2026-08-03 至 2026-08-09\n标识词：空\n写云图：是\n卡片：自定义分析 / 公域触点 / 全网搜索\n不要跑标签工厂、不要 CVR。",
+        need: "词包已在工程关键词工具内则不必附。若换词，附「品牌-词」表。",
+        does: "只开 keyword 工具；全网搜索卡提交。",
+        back: "包名、人群包 ID、覆盖人数或计算中。" },
+      { id: "w-tag", g: "周报", name: "只建点购标签",
+        say: "任务：只建点击+购买标签\n品类：MG 和 OHC\n周期：WTD 2026-08-03 至 2026-08-09\n写云图：是\n位置：数据工厂 / 标签工厂 / 商品人群标签\n行为：点击、购买。本步不要建出人群包。",
+        need: "品牌名单默认用总控里的 MG/OHC 列表。要加减品牌时写出名单。",
+        does: "只开 tagFactory。",
+        back: "标签名、标签 ID、状态。点击标签标明「不建出」。" },
+      { id: "w-diff", g: "周报", name: "只作差购买标签",
+        say: "任务：只建作差购买标签\n品类：MG 和 OHC\n作差区间：startDate 至 endDate（endDate 默认=本周 weekStart 前一天）\n写云图：是\n只创建购买标签，不创建点击标签。段码写死「做差」。",
+        need: "作差起止日。品牌名单若与默认不同请列出。须已有点购标签批次，或允许它先建点购。",
+        does: "开 tagFactoryDiff。",
+        back: "做差购买标签名与 ID。" },
+      { id: "w-out", g: "周报", name: "只建出购买包",
+        say: "任务：标签建出人群包\n范围：本周 WTD 购 + 做差购\n不要建出任何点击标签\n写云图：是\n页面动作：标签工厂列表 → 创建人群包 → 落入我的人群。",
+        need: "对应购买标签须已生效。给交付标签即可。",
+        does: "跑 tagToAudience。",
+        back: "人群包名、ID、cover。点击标签应显示未建出。" },
+      { id: "w-cvr", g: "周报", name: "只关键词 CVR",
+        say: "任务：关键词 CVR\n运算：我的人群 · 池内取交集\n配对：关键词包 ∩ 对应品牌 WTD 购\n写云图：是\n上游包必须已有覆盖人数，没有 cover 就不要提交。",
+        need: "关键词包与 WTD 购包已建出。品类 MG/OHC。",
+        does: "prepare_cvr_input + cvr 工具。",
+        back: "cvr 包名、ID、cover。配对表。" },
+      { id: "w-dif", g: "周报", name: "只差集新客购",
+        say: "任务：购买差集\n运算：我的人群 · 跨池排除\n配对：WTD购 − 做差购\n结果名按新客{品类}{品牌}购\n写云图：是\n无 cover 不提交。",
+        need: "WTD 购包与做差购包均已建出且有 cover。",
+        does: "prepare_dif_input + dif 工具。",
+        back: "差集包名、ID、cover。" },
+      { id: "w-sv", g: "周报", name: "只 Search",
+        say: "任务：SearchVolume\n品类：MG 和 OHC\nA段：2026-08-03 至 2026-08-09\nB段：请手写（不要自动乱推）\n先跑无前置：品牌词 UV、品牌 UV（全网搜索 / 人群夹 / 直播圈人 / 小店圈人）\n飞利浦 WTD 购注入后再跑进店、购买。\n写云图：是",
+        need: "A/B 两段日期。进店/购买需要已建出的飞利浦 WTD 购。",
+        does: "searchVolumeEarly → 购注入 → searchVolumeLate。",
+        back: "各 SV 包名与 cover。未齐的晚段标计算中。" },
+      { id: "w-svcvr", g: "周报", name: "只 Search CVR",
+        say: "任务：Search CVR\n配对1：品牌词 UV ∩ WTD购 → 品牌搜索词cvr\n配对2：品牌 UV ∩ WTD购 → 品牌搜索cvr\n运算：我的人群池内取交集\n无 cover 不提交。",
+        need: "SV 无前置包与 WTD 购包均已有 cover。",
+        does: "cvrSearch。",
+        back: "两个 cvr 包的 ID 与 cover。" },
+      { id: "w-flow", g: "周报", name: "只流向",
+        say: "任务：流向\n卡片：小店圈人 · 商品点击（直播场景 / 商品卡场景）\n与品牌词搜索 UV 做交集权重包\n写云图：是",
+        need: "品牌词 UV 包一般已在。类目/品牌 ID 用工程默认，除非要改。",
+        does: "flow 工具。",
+        back: "流向包名、ID、cover。" },
+      { id: "w-qbt", g: "周报", name: "只情报通",
+        say: "任务：情报通\n动作：先抓取，再填价格带到周报表\n周期：本周 0809\n写云图：否（情报通不是云图模块）",
+        need: "情报通 Cookie。日期。每月 10 日前若平台未出数，允许只抓不填并说明。",
+        does: "qbtCapture → qbtFill。",
+        back: "价格带文件、填了哪些格、未出数的品牌。" },
+      { id: "w-fill", g: "周报", name: "只填表",
+        say: "任务：只填周报表\n不要新建云图对象\n把已有覆盖人数写入 OHC/MG 底表对应格\n核对表就地更新包名。",
+        need: "交付标签。Cookie 仅用于取 cover。",
+        does: "fetch_and_fill。",
+        back: "填数表路径、核对表路径、仍缺清单。" },
+      { id: "w-check", g: "周报", name: "只出核对表",
+        say: "任务：更新核对表\n版式：周报底表同版式，数字格改填包名/标签名\n文件：包名核对-OHC类目.xlsx、包名核对-MG类目.xlsx\n就地更新，不要另存一堆日期文件。",
+        need: "本周已建对象名单（工程内有登记则不必附）。",
+        does: "按格子写包名。",
+        back: "两份核对表。" },
+      { id: "m-full", g: "月报", name: "月报全链路",
+        say: "任务：月报 0 到 5 全链路\n品类：MG\n周期：2026-07-01 至 2026-07-31，标签 7月\n标识词：正式或你指定的词\n写云图：是\n步骤：内容人群标签 → 上月/当月品类 A3A2A1 → 新增差集 → 购买交 → 看播交\n交包必须等上游 cover。购买底包用已有 MG-飞利浦购买-该月，不要重建。",
+        need: "云图 Cookie。当月购买底包 ID（没有则先说明）。直播主播默认用 config 里五人，要换人则附账号 ID。",
+        does: "改月报 config.js；跑 run_monthly_pipeline.py。",
+        back: "标签与人群包名单、cover、pipeline_summary。失败标签单独列出。" },
+      { id: "m-tag", g: "月报", name: "只建内容标签",
+        say: "任务：只建月报内容人群标签\n位置：数据工厂 / 标签工厂 / 内容人群标签\n行为：有效播放、点赞、评论、转发；当月+上月\n写云图：是\n先不要建品类包。",
+        need: "月份。关键词用工程 MG 品牌词，换词则附词表。",
+        does: "只跑阶段 0。",
+        back: "10 个标签的 ID、status、cover。" },
+      { id: "m-cat", g: "月报", name: "只建品类包",
+        say: "任务：只建品类 A3/A2/A1（上月+当月）\n运算池1并集触点，跨池排除近一年小店成交\n内容标签必须已就绪\n写云图：是",
+        need: "已就绪的内容标签。月份。近一年回溯按模板 365 天。",
+        does: "阶段 1 品类 + 直播整体看播。",
+        back: "品类包 ID 与 cover。" },
+      { id: "m-new", g: "月报", name: "只建新增差集",
+        say: "任务：只建新增 A3/A2/A1\n运算：我的人群跨池排除\n新增A3=当月品类A3−上月品类A3，A2/A1 再排除更高意向新增\n上游必须有 cover。",
+        need: "当月与上月品类包已生效。",
+        does: "阶段 2。",
+        back: "三个新增包 ID 与 cover。" },
+      { id: "m-x", g: "月报", name: "只建交包",
+        say: "任务：购买交 + 看播交\n运算：我的人群池内取交集 (0)&(1)\n购买交：新增A3 ∩ 当月购买\n看播交：整体看播 ∩ 品类/新增A3；五间分别 ∩ 新增A3\n无 cover 禁止提交。",
+        need: "新增A3、购买底包、看播包均有 cover。购买底包名与 ID。",
+        does: "阶段 3。",
+        back: "交包名单与 cover；若未齐只回报阻塞包。" },
+      { id: "a-week", g: "分析", name: "周报分析",
+        say: "任务：周报分析\n周期：0809\n问题：品牌词 UV、进店、购买、Search CVR、流向、价格带各看什么\n请用已有 cover，不要估算。原数据附件和分析同一条消息发我。",
+        need: "该周填数表 / 核对表已产出，或允许 OpenClaw 先取数。分析问题用一句话写清。",
+        does: "读 cover 与填表；写分析；打包附件。",
+        back: "结论不超过五条 + xlsx/json + 未齐清单。" },
+      { id: "a-month", g: "分析", name: "月报分析",
+        say: "任务：月报分析\n月份：7月\n问题：品类A3体量、新增A3、购买交、五间看播交\n口径必须与建包一致：品类=触点并集−近一年成交。缺 cover 标计算中。原数据与分析一起发。",
+        need: "pipeline_summary 或允许先查云图 cover。",
+        does: "按包名取 cover 写分析。",
+        back: "结论、包名单、未齐项。" },
+      { id: "d-live", g: "改卡", name: "改直播主播",
+        say: "任务：改直播圈人主播名单\n月报 config.liveAnchors 换成附件 ID\n先 dry-run 给我看包名变化，确认后再写云图。",
+        need: "主播名称 + 云图账号 ID 表。说明要改月报还是周报 Search 进店。",
+        does: "只改对应模块配置；dry-run；你确认后正式跑。",
+        back: "将影响哪些包；dry-run 摘要。" },
+      { id: "d-word", g: "改卡", name: "改搜索词 / 内容词",
+        say: "任务：替换关键词规则\n范围：周报全网搜索 或 月报内容人群标签\n新词见附件，一行一个。先 dry-run。",
+        need: "词表文件。写明周报还是月报。",
+        does: "改词包配置，不改卡片类型。",
+        back: "新旧词数量、将重建哪些标签/包。" }
+    ];
+    const TALK_GROUPS = [["一次","一次性"],["周报","周报"],["月报","月报"],["分析","分析"],["改卡","改卡片参数"]];
+    let talkId = "w-full";
+    function talkCur() { return TALKS.find((t) => t.id === talkId) || TALKS[0]; }
+    function renderTalk() {
+      const nav = document.getElementById("talk-nav");
+      if (!nav) return;
+      const t = talkCur();
+      talkId = t.id;
+      nav.innerHTML = TALK_GROUPS.map(([gid, label]) => {
+        const items = TALKS.filter((x) => x.g === gid).map((x) =>
+          `<button type="button" data-id="${x.id}" class="${x.id===t.id?"on":""}">${x.name}</button>`
+        ).join("");
+        return `<div class="g">${label}</div>${items}`;
+      }).join("");
+      nav.querySelectorAll("button").forEach((b) => {
+        b.onclick = () => { talkId = b.dataset.id; renderTalk(); };
+      });
+      document.getElementById("talk-detail").innerHTML =
+        `<h2>${t.name}</h2>
+         <h3>复制到飞书</h3>
+         <div class="say">${t.say.replace(/</g,"&lt;")}</div>
+         <div class="use">
+           <div><h3>要给的材料</h3><p>${t.need}</p></div>
+           <div><h3>OpenClaw 做什么</h3><p>${t.does}</p></div>
+         </div>
+         <p class="src" style="margin-top:12px"><b>你收回：</b>${t.back}</p>`;
+    }
     document.getElementById("tabs").onclick = (e) => {
       const b = e.target.closest("button");
       if (!b) return;
       document.querySelectorAll(".panel").forEach((p) => p.classList.toggle("on", p.id === b.dataset.tab));
       document.querySelectorAll("#tabs button").forEach((x) => x.classList.toggle("on", x === b));
       if (b.dataset.tab === "cards") render();
+      if (b.dataset.tab === "talk") renderTalk();
     };
     render();
   </script>
