@@ -129,6 +129,20 @@
     .legend { display: flex; gap: 14px; flex-wrap: wrap; margin: 0 0 14px; font-size: 12px; color: var(--muted); }
     .src { margin-top: 12px; font-size: 12px; color: var(--muted); }
     code { font-family: ui-monospace, Menlo, monospace; font-size: 11.5px; background: #eef4f2; padding: 1px 5px; border-radius: 4px; }
+    .tabs button.pri { box-shadow: 0 0 0 1.5px #9ad4c6; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    .num { display: flex; gap: 12px; margin: 0 0 12px; }
+    .num i {
+      flex: 0 0 28px; height: 28px; border-radius: 50%;
+      background: var(--teal); color: #fff; font-style: normal;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 650; margin-top: 2px;
+    }
+    .num p { margin: 0; }
+    .num b { display: block; }
+    @media (max-width: 980px) {
+      .grid3 { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -147,6 +161,8 @@
       <button data-tab="weekly">周报拓扑</button>
       <button data-tab="monthly">月报拓扑</button>
       <button data-tab="ops">运算与交付</button>
+      <button class="pri" data-tab="claw">飞书 OpenClaw</button>
+      <button class="pri" data-tab="analysis">原数据与分析</button>
     </div>
 
     <section class="panel on" id="map">
@@ -358,6 +374,179 @@
           <h3>调度与回传</h3>
           <p>飞书给出周期、MG/OHC、试跑或正式、范围（标签 / 建包 / 填表）。只改 <code>config.js</code>。定时：月初建月报包；每月 10 日后情报通填表。无覆盖人数不得提交交集。</p>
         </div>
+      </div>
+    </section>
+
+    <section class="panel" id="claw">
+      <p class="lede">生产目标不是本机点选，而是：飞书给出业务需求 → OpenClaw 澄清槽位 → 只改配置、按已有 DAG 在服务器执行。模块不够时，再由 Deep Engineer 改单个功能并重排并行/串行，然后封成 skill 与定时任务。</p>
+      <div class="kpis">
+        <div class="kpi"><b>入口</b><span>飞书对话，不进云图后台</span></div>
+        <div class="kpi"><b>真源</b><span>只改 config.js，不改卡片语义</span></div>
+        <div class="kpi"><b>执行</b><span>服务器脚本 · Cookie 文件 · 禁止 MCP</span></div>
+        <div class="kpi"><b>扩展</b><span>Deep Engineer 改模块 + 重排 DAG</span></div>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <h2>主路径</h2>
+        <div class="swim">
+          <div class="ph"><b>1</b>飞书</div>
+          <div class="row">
+            <div class="node"><b>业务需求</b><span>周期、MG / OHC、试跑或正式、范围（标签 / 建包 / 填表 / 分析）</span></div>
+          </div>
+          <div class="ph"><b>2</b>澄清</div>
+          <div class="row">
+            <div class="node"><b>OpenClaw skill 回问</b><span>缺参不猜。去年段日期必须手写。Cookie 缺失则停，向用户要文件，不写进公开文档。</span></div>
+          </div>
+          <div class="ph"><b>3</b>配置</div>
+          <div class="row">
+            <div class="nodes">
+              <div class="node"><b>周报</b><span>weekStart / weekEnd / deliveryTag / nameRunMark</span></div>
+              <div class="node"><b>月报</b><span>自然月、标识词、createEnabled、dryRun</span></div>
+            </div>
+          </div>
+          <div class="ph"><b>4</b>执行</div>
+          <div class="row">
+            <div class="nodes">
+              <div class="node"><b>周报总控</b><span>dag.js 阶段内并行、阶段间串行</span></div>
+              <div class="node"><b>月报流水线</b><span>内容标签 → 品类 → 新增 → 购买交 / 看播交</span></div>
+            </div>
+          </div>
+          <div class="ph"><b>5</b>扩展</div>
+          <div class="row">
+            <div class="para">
+              <div class="lab">仅在现有模块不够时触发 Deep Engineer</div>
+              <div class="nodes">
+                <div class="node"><b>改单个模块</b><span>例如小店圈人行为、直播主播名单、填表格位</span></div>
+                <div class="node"><b>重排 DAG</b><span>阶段内并行、阶段间串行、waitAudienceCalc</span></div>
+                <div class="node"><b>封 skill + 定时</b><span>周报周期、月初建月报包、每月 10 日后情报通</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="src">约束来自既有决策：生产路径必须是 <code>config.js</code> + 脚本，不能把本机 Chrome MCP 当执行器。服务器上没有本人浏览器。</p>
+      </div>
+      <div class="grid21" style="margin-bottom:16px">
+        <div class="card">
+          <h3>OpenClaw 必须问清的槽位</h3>
+          <table>
+            <thead><tr><th>槽位</th><th>规则</th></tr></thead>
+            <tbody>
+              <tr><td>品类</td><td>MG / OHC；月报默认 MG</td></tr>
+              <tr><td>周期</td><td>周报起止日；月报自然月。L 前缀=去年，日期手写</td></tr>
+              <tr><td>标识词</td><td>试跑用「测」等；正式为空或约定词</td></tr>
+              <tr><td>范围</td><td>仅标签 / 建包 / 填表 / 分析；可组合</td></tr>
+              <tr><td>写云图</td><td>dryRun 或正式。未确认不得 createEnabled=true</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h3>Deep Engineer 边界</h3>
+          <table>
+            <thead><tr><th>可改</th><th>不可改</th></tr></thead>
+            <tbody>
+              <tr><td>子工具参数、dag 阶段、填表格位</td><td>云图卡片字段语义（小店「商品成交」≠ 点击）</td></tr>
+              <tr><td>新增并行阶段、wait 覆盖人数</td><td>跳过 cover 检查去提交交集</td></tr>
+              <tr><td>把现有脚本封成 skill / cron</td><td>把用户属性、兴趣偏好等未接卡当已接</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <h2>已有底座 / 待建</h2>
+        <table>
+          <thead><tr><th>层</th><th>状态</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>配置单点</td><td class="yes">已有</td><td>周报 / 月报均以 <code>config.js</code> 为日常入口</td></tr>
+            <tr><td>DAG 编排</td><td class="yes">已有</td><td>周报 <code>dag.js</code>；月报流水线阶段 0→3</td></tr>
+            <tr><td>命令入口</td><td class="yes">已有</td><td><code>开始.command</code> / <code>run_monthly_pipeline.py</code></td></tr>
+            <tr><td>认证</td><td class="yes">已有</td><td>Cookie 文件；不挂本人日常 Chrome</td></tr>
+            <tr><td>同构手册</td><td class="yes">已有形态</td><td>怡丽丝尔报表已按「解压 → 改路径 → 只改 config → 跑 command」交给 OpenClaw</td></tr>
+            <tr><td>飞书 Bot + 飞利浦 skill</td><td class="no">待建</td><td>把周报总控 / 月报流水线封成 OpenClaw skill，槽位回问写入配置</td></tr>
+            <tr><td>Deep Engineer</td><td class="no">待建</td><td>按需求改单模块并重排并行 DAG，dry-run 通过后再部署</td></tr>
+            <tr><td>服务器定时</td><td class="no">待建</td><td>周报周期触发；月初月报；每月 10 日后情报通</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" id="analysis">
+      <p class="lede">云图写操作完成之后，必须把原数据与分析报告成套回传。分析不得在覆盖人数未出时估算，也不得只给结论不给底数。</p>
+      <div class="card" style="margin-bottom:16px">
+        <h2>成套回传</h2>
+        <div class="swim">
+          <div class="ph"><b>1</b>齐数</div>
+          <div class="row">
+            <div class="node"><b>等待就绪</b><span>标签 status=3；人群包已生效且有覆盖人数。未齐项标计算中，不编造。</span></div>
+          </div>
+          <div class="ph"><b>2</b>原数据</div>
+          <div class="row">
+            <div class="nodes">
+              <div class="node"><b>云图对象</b><span>标签 ID、人群包 ID、覆盖人数、运算规则</span></div>
+              <div class="node"><b>报表文件</b><span>填数表、核对表（格内为包名）、情报通价格带</span></div>
+              <div class="node"><b>运行痕迹</b><span>pipeline JSON、check_latest、日志摘要</span></div>
+            </div>
+          </div>
+          <div class="ph"><b>3</b>分析</div>
+          <div class="row">
+            <div class="node"><b>按用户问题切片</b><span>在原数据上做份额、CVR、新增、看播交等，不另开一套口径</span></div>
+          </div>
+          <div class="ph"><b>4</b>飞书</div>
+          <div class="row">
+            <div class="node"><b>结论 + 附件</b><span>短结论、未齐清单、xlsx / json / 包名单。原数据与分析同一条消息发出。</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="grid21" style="margin-bottom:16px">
+        <div class="card">
+          <h3>周报原数据</h3>
+          <table>
+            <thead><tr><th>对象</th><th>来源</th></tr></thead>
+            <tbody>
+              <tr><td>覆盖人数</td><td>云图人群包；写入周报表对应格</td></tr>
+              <tr><td>核对表</td><td>同一版式，数字格改为包名 / 标签名</td></tr>
+              <tr><td>点购 / 作差 / 建出</td><td>标签工厂结果 + 创建人群包 ID</td></tr>
+              <tr><td>CVR / 差集</td><td>我的人群交集、跨池排除后的包</td></tr>
+              <tr><td>Search / 流向</td><td>全网搜索、小店圈人点击等包</td></tr>
+              <tr><td>情报通</td><td>nint 价格带，10 日后填表</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h3>月报原数据</h3>
+          <table>
+            <thead><tr><th>对象</th><th>来源</th></tr></thead>
+            <tbody>
+              <tr><td>内容人群标签</td><td>dmpId、cover、行为与日期窗</td></tr>
+              <tr><td>品类 A3 / A2 / A1</td><td>触点并集排除近一年成交后的包 ID 与 cover</td></tr>
+              <tr><td>新增</td><td>差集包；依赖上月与当月品类 cover</td></tr>
+              <tr><td>购买交 / 看播交</td><td>池内取交集；无上游 cover 不得提交</td></tr>
+              <tr><td>流水线摘要</td><td><code>pipeline_summary_*.json</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <h2>分析报告写什么</h2>
+        <div class="grid3">
+          <div>
+            <h3>周报</h3>
+            <p>品牌词 UV、进店、购买、Search CVR、流向点击结构、情报通价格带。CVR 必须对应「搜索包 ∩ 购买包」的覆盖人数，不是表内相除。</p>
+          </div>
+          <div>
+            <h3>月报</h3>
+            <p>品类 A3 体量、新增 A3、购买交转化、整体看播与五间看播交。口径与建包规则一致：品类=触点并集 − 近一年成交。</p>
+          </div>
+          <div>
+            <h3>用户加问</h3>
+            <p>在原数据包上切片，不另建未声明的云图卡片。缺 cover 的指标标计算中，并列出阻塞的标签或人群包名称。</p>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>回传格式</h2>
+        <div class="num"><i>1</i><p><b>飞书正文</b>可执行结论不超过五条；未齐项单独列表。</p></div>
+        <div class="num"><i>2</i><p><b>附件包</b>填数表 / 核对表、pipeline JSON、人群包与标签名单（名、ID、cover、状态）。</p></div>
+        <div class="num"><i>3</i><p><b>分析件</b>飞书文档或 HTML，每条判断标注所用包名与 cover。原数据与分析必须同时送达。</p></div>
+        <p class="src">分析 skill 待建；取数与填表已有。OpenClaw 在 cover 未齐时只回传原数据状态，不出分析结论。</p>
       </div>
     </section>
   </div>
