@@ -180,15 +180,30 @@
     .roles .o { background: var(--mint); }
     @media (max-width: 980px) {
       .grid3 { grid-template-columns: 1fr; }
-      .grid4 { grid-template-columns: 1fr 1fr; }
       .chain-head, .chain-step { grid-template-columns: 36px 1fr; }
       .chain-head span:last-child, .chain-step .box.bot { grid-column: 2; }
     }
-    .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    .stage { background: var(--paper); border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow); }
-    .stage .ord { font-size: 11px; color: var(--mint); letter-spacing: .12em; margin-bottom: 6px; }
-    .stage b { display: block; margin-bottom: 6px; }
-    .stage p { margin: 0; color: var(--muted); font-size: 12.5px; }
+    .flow {
+      display: flex; align-items: stretch; gap: 0; margin: 0 0 18px;
+    }
+    .flow .fb {
+      flex: 1; min-width: 0;
+      background: var(--paper); border-radius: 12px;
+      padding: 14px 14px 12px; box-shadow: var(--shadow);
+    }
+    .flow .fb .ord {
+      font-size: 11px; color: var(--mint); letter-spacing: .1em; margin-bottom: 6px;
+    }
+    .flow .fb b { display: block; font-size: 15px; margin-bottom: 8px; }
+    .flow .fb p { margin: 0; font-size: 12.5px; color: var(--muted); }
+    .flow .arr {
+      flex: 0 0 26px; display: flex; align-items: center; justify-content: center;
+      color: var(--mint); font-size: 20px; font-weight: 600;
+    }
+    @media (max-width: 980px) {
+      .flow { flex-direction: column; }
+      .flow .arr { transform: rotate(90deg); height: 22px; }
+    }
   </style>
 </head>
 <body>
@@ -403,184 +418,75 @@
     </section>
 
     <section class="panel" id="claw">
-      <p class="lede">代码上服务器之后，人把业务需求发到飞书。OpenClaw 先自己确认需求，再按下面四段往前走：先跟人一起改单个功能，再自己设计多个功能的串联和并发，然后配成定时任务，全部做完后把原数据和分析结论一起交回。</p>
-      <div class="kpis">
-        <div class="kpi"><b>① 改单功能</b><span>人配合 OpenClaw 改写一块逻辑</span></div>
-        <div class="kpi"><b>② Deep Engineer</b><span>自己设计多功能串联 / 并发</span></div>
-        <div class="kpi"><b>③ 定时</b><span>配成到点自动跑</span></div>
-        <div class="kpi"><b>④ 成套交付</b><span>原数据 + 分析结论一起给</span></div>
-      </div>
-      <div class="grid4" style="margin-bottom:16px">
-        <div class="stage">
+      <p class="lede">主线只有这一条。现在人在本机改代码；以后代码上服务器，人只在飞书发需求。OpenClaw 确认后按箭头往下走，不能跳步、不能把四段合成一句「新能力」。</p>
+      <div class="flow">
+        <div class="fb">
+          <div class="ord">入口</div>
+          <b>飞书发需求</b>
+          <p>人说话。OpenClaw 回确认卡。不确认，不往下走。</p>
+        </div>
+        <div class="arr">→</div>
+        <div class="fb">
           <div class="ord">一开始</div>
-          <b>改写单个功能</b>
-          <p>对着已经跑通的样例，只改这一块。人看改法、拍板。还不是整条链路。</p>
+          <b>① 改单个功能</b>
+          <p>人配合改写一块逻辑。对着样例只改一处。</p>
         </div>
-        <div class="stage">
-          <div class="ord">后面 · Deep Engineer</div>
-          <b>自己设计 DAG</b>
-          <p>多个功能谁先谁后、谁可以一起做，由 OpenClaw 自己排，人确认整张图。</p>
+        <div class="arr">→</div>
+        <div class="fb">
+          <div class="ord">后面</div>
+          <b>② 自己设计 DAG</b>
+          <p>Deep Engineer 排出多功能谁并行、谁等待。人确认步骤图。</p>
         </div>
-        <div class="stage">
+        <div class="arr">→</div>
+        <div class="fb">
           <div class="ord">再然后</div>
-          <b>配成定时任务</b>
-          <p>DAG 跑通后，设成每周 / 每月自动启动。失败只问人，不擅自写云图。</p>
+          <b>③ 配成定时</b>
+          <p>DAG 通过后到点自动跑。失败只问人。</p>
         </div>
-        <div class="stage">
-          <div class="ord">全部做完后</div>
-          <b>原数据 + 分析一起交</b>
-          <p>覆盖人数齐了，按人的问题写结论。两样同一条飞书，缺一样不算交付。</p>
-        </div>
-      </div>
-      <div class="card" style="margin-bottom:16px">
-        <h2>入口：飞书把需求发给 OpenClaw，它自己确认</h2>
-        <p>人不进云图、不 SSH。半句话也可以。OpenClaw 必须先回确认卡，人回「确认」才往下走。</p>
-        <div class="roles"><span><i class="h"></i>人</span><span><i class="o"></i>OpenClaw</span></div>
-        <div class="chain-head"><span></span><span>人</span><span>OpenClaw</span></div>
-        <div class="chain-step">
-          <div class="n">1</div>
-          <div class="box human"><b>飞书说要做什么</b><span>可半句，可附 Excel / 词表。</span></div>
-          <div class="box bot"><b>回确认卡</b><span>写清品类、周期、是否正式写入云图、将走①②③④哪一段。</span></div>
-        </div>
-        <div class="chain-step">
-          <div class="n">2</div>
-          <div class="box human"><b>回「确认」或改一处</b><span>日期、品类、写不写云图，以人这句为准。</span></div>
-          <div class="box idle"><b>等待拍板</b><span>不问清不猜，未确认不写云图。</span></div>
-        </div>
-        <div class="say">人：给飞利浦加一套只要购买、不要点击的标签，挂进周报，以后每周自动跑，跑完把原数据和分析一起发我。
-OpenClaw 确认卡必须拆开：先改哪一个功能 → 再怎么串进整条周报 → 是否设定时 → 交付是原数据+分析。不能合成一句「新能力」就开跑。</div>
-      </div>
-      <div class="card" style="margin-bottom:16px">
-        <h2>① 一开始：人配合 OpenClaw 改写单个功能</h2>
-        <p>这一段只改一块逻辑。人要看懂「改的是什么」，OpenClaw 对着现成样例改，禁止从空白写一套。</p>
-        <div class="chain-head"><span></span><span>人</span><span>OpenClaw</span></div>
-        <div class="chain-step">
-          <div class="n">1</div>
-          <div class="box human"><b>说这一块要什么</b><span>例如「只要购买、不要点击的第二套标签」。</span></div>
-          <div class="box bot"><b>找出最像的样例</b><span>周报标签工厂、交集、差集、月报品类档，复制后再改。</span></div>
-        </div>
-        <div class="chain-step">
-          <div class="n">2</div>
-          <div class="box human"><b>确认这一块的改法</b><span>看将改的行为、配对、阈值；先试跑、不写云图。</span></div>
-          <div class="box bot"><b>只改这一处</b><span>把将生成的包名发回飞书。人没点头，不装成可喊的能力。</span></div>
-        </div>
-        <table>
-          <thead><tr><th>人要的单功能</th><th>对着哪份样例改</th><th>只改什么</th></tr></thead>
-          <tbody>
-            <tr><td>只要购买、不要点击</td><td>标签工厂建包</td><td>行为只留购买</td></tr>
-            <tr><td>新的转化配对</td><td>人群包交集</td><td>A 包和 B 包怎么配、结果叫什么</td></tr>
-            <tr><td>新的差集定义</td><td>人群包差集</td><td>谁减谁、结果叫什么</td></tr>
-            <tr><td>月报多一档意向</td><td>现有品类 A3</td><td>触点阈值</td></tr>
-          </tbody>
-        </table>
-        <p class="src">作差购买、月报低意向档，当初都是这样从单块样例改出来的。这一段结束时，只有一个可单独喊的功能，还没有整条周报/月报的编排。</p>
-      </div>
-      <div class="card" style="margin-bottom:16px">
-        <h2>② 后面：OpenClaw 自己设计串联 / 并发 DAG（Deep Engineer）</h2>
-        <p>单功能齐了之后，人不再手排「先跑谁、后跑谁」。Deep Engineer 自己画出多功能怎么串、怎么并行。人确认的是整张步骤图，不是每一行代码。</p>
-        <div class="chain-head"><span></span><span>人</span><span>OpenClaw · Deep Engineer</span></div>
-        <div class="chain-step">
-          <div class="n">1</div>
-          <div class="box human"><b>说要一条完整任务</b><span>例如「把新标签编进周报主链路」。</span></div>
-          <div class="box bot"><b>自己排出步骤图</b><span>哪些同时做，哪些必须等覆盖人数。把图发回飞书。</span></div>
-        </div>
-        <div class="chain-step">
-          <div class="n">2</div>
-          <div class="box human"><b>确认这张图</b><span>看并行是否合理、有没有把转化放到人数出来之前。</span></div>
-          <div class="box bot"><b>按图把功能串起来</b><span>试跑不写云图。通过后，这条链才能被定时调用。</span></div>
-        </div>
-        <table>
-          <thead><tr><th>它必须自己排出来的</th><th>已经在跑的周报 / 月报样例</th></tr></thead>
-          <tbody>
-            <tr><td>互不依赖的功能并行</td><td>关键词、点购标签、情报通可以同时做</td></tr>
-            <tr><td>有先后的必须串</td><td>先点购标签，再作差；先有购买包，再做转化和差集</td></tr>
-            <tr><td>人数没出，不准提交下一步</td><td>没有覆盖人数，不准做交集包</td></tr>
-            <tr><td>月报同构</td><td>内容标签齐 → 品类 → 新增 → 购买交和看播交同时</td></tr>
-          </tbody>
-        </table>
-        <p class="src">Deep Engineer 不是把几个单功能叠在一起交差。它要自己决定并发和等待。打乱「等人」这条规则的图，人必须驳回。</p>
-      </div>
-      <div class="card" style="margin-bottom:16px">
-        <h2>③ 再然后：自动配成定时任务</h2>
-        <p>DAG 试跑通过之后，才进入这一段。OpenClaw 自己写下一次何时启动，人确认时间表。到点不必人再喊「开始跑」。</p>
-        <div class="chain-head"><span></span><span>人</span><span>OpenClaw</span></div>
-        <div class="chain-step">
-          <div class="n">1</div>
-          <div class="box human"><b>确认何时跑、要不要每次再确认</b><span>默认正式写入云图前仍问一次，除非人事先说免确认。</span></div>
-          <div class="box bot"><b>写入定时</b><span>调用已经排好的 DAG，不是另写一套。</span></div>
-        </div>
-        <div class="chain-step">
-          <div class="n">2</div>
-          <div class="box idle"><b>平时不用管</b><span>只在它问的时候接手。</span></div>
-          <div class="box bot"><b>到点启动；失败只问人</b><span>登录失效、缺去年日期、人数未齐，停写云图并飞书说明。</span></div>
-        </div>
-        <table>
-          <thead><tr><th>定时做什么</th><th>何时</th><th>失败时问人什么</th></tr></thead>
-          <tbody>
-            <tr><td>不需运算线</td><td>周报周期锁定后、主链路前</td><td>去年日期没手写则停</td></tr>
-            <tr><td>周报主链路</td><td>周期结束后或约定周一</td><td>登录失效则密聊要新凭证</td></tr>
-            <tr><td>月报建包</td><td>每月 1 日先试跑，确认后再正式</td><td>没确认不准正式写入</td></tr>
-            <tr><td>情报通</td><td>每月 10 日及之后</td><td>平台未出数则只报未出</td></tr>
-            <tr><td>成套交付</td><td>全部做完之后</td><td>仍缺覆盖人数则只发状态，不写分析结论</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="card" style="margin-bottom:16px">
-        <h2>④ 交付形式：原数据和分析结论必须一起给</h2>
-        <p>不是「跑完就算」。全部做完后，OpenClaw 按人的分析问题写结论，和原数据放在同一条飞书里。只发结论、不发原数据，视为没交付。细节在「原数据与分析」。</p>
-        <div class="chain-head"><span></span><span>人</span><span>OpenClaw</span></div>
-        <div class="chain-step">
-          <div class="n">1</div>
-          <div class="box human"><b>分析要回答什么（可空）</b><span>空则出标准切片。有问题贴原话。</span></div>
-          <div class="box bot"><b>先判定齐数</b><span>该填的都有数、人群包都有覆盖人数。没齐只报还在算什么。</span></div>
-        </div>
-        <div class="chain-step">
-          <div class="n">2</div>
-          <div class="box human"><b>同一条消息收回两样</b><span>原数据附件 + 分析结论。转给看数同事也要整条转发。</span></div>
-          <div class="box bot"><b>两样一起发出</b><span>每条结论都能指回某一个包的覆盖人数。人数未出不估算。</span></div>
-        </div>
-      </div>
-      <div class="card" style="margin-bottom:16px">
-        <h2>人必须拍板的几件事</h2>
-        <table>
-          <thead><tr><th>拍板项</th><th>人怎么说</th><th>OpenClaw 不许做的</th></tr></thead>
-          <tbody>
-            <tr><td>品类 / 周期</td><td>MG、OHC；周报起止或自然月。去年日期人手写。</td><td>自己推去年日期</td></tr>
-            <tr><td>试跑 / 正式</td><td>是否写入云图必须明确。</td><td>未确认就创建</td></tr>
-            <tr><td>① 单功能改法</td><td>确认改的是哪一块。</td><td>偷偷改别的模块</td></tr>
-            <tr><td>② DAG 步骤图</td><td>确认谁并行、谁等待。</td><td>人数没出就提交交集</td></tr>
-            <tr><td>③ 定时</td><td>何时跑、以后是否免确认。</td><td>失败仍写云图</td></tr>
-            <tr><td>④ 分析问题</td><td>没有加问就标准切片；有问题按原话。</td><td>只发结论不发原数据</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="grid21" style="margin-bottom:16px">
-        <div class="card">
-          <h3>现在（本机代码）</h3>
-          <p>人改配置、双击开始。单功能、步骤顺序、定时都是人排的。</p>
-        </div>
-        <div class="card">
-          <h3>以后（服务器 + 飞书）</h3>
-          <p>同一套程序在服务器。人只在飞书说话。OpenClaw 确认需求后，按 ①改单功能 → ②自己设计 DAG → ③定时 → ④原数据+分析 往下走。</p>
+        <div class="arr">→</div>
+        <div class="fb">
+          <div class="ord">全部做完</div>
+          <b>④ 一起交付</b>
+          <p>原数据 + 分析结论同一条飞书。缺一样不算交。</p>
         </div>
       </div>
       <div class="card">
-        <h2>谁已经能做，谁还待接</h2>
+        <h2>这条线上，两边各做什么</h2>
         <table>
-          <thead><tr><th></th><th>状态</th><th>说明</th></tr></thead>
+          <thead><tr><th>主线</th><th>人</th><th>OpenClaw</th></tr></thead>
           <tbody>
-            <tr><td>周报 / 月报各单功能与现有步骤图</td><td class="yes">已有</td><td>本机代码已经在跑，是 ①② 的样例</td></tr>
-            <tr><td>飞书确认需求后执行</td><td class="no">待接</td><td>入口还没接到 Bot</td></tr>
-            <tr><td>① 配合人改写单功能</td><td class="no">待接</td><td>对着样例改一处，封成可喊的能力</td></tr>
-            <tr><td>② Deep Engineer 自己设计 DAG</td><td class="no">待接</td><td>多功能串联 / 并发，人确认步骤图</td></tr>
-            <tr><td>③ 自动配定时</td><td class="no">待接</td><td>DAG 通过后才写</td></tr>
-            <tr><td>④ 原数据 + 分析一起交付</td><td class="no">待接</td><td>取数填表已有，按问题写分析并成套回传待建</td></tr>
+            <tr>
+              <td>入口</td>
+              <td>飞书说要做什么；看确认卡，回「确认」或改一处</td>
+              <td>自己确认需求：品类、周期、写不写云图、将走到①②③④哪一段。未确认不写云图</td>
+            </tr>
+            <tr>
+              <td>① 改单个功能</td>
+              <td>说这一块要什么；确认改法</td>
+              <td>对着已跑通的样例只改这一处，试跑把包名发回。还不是整条链路</td>
+            </tr>
+            <tr>
+              <td>② Deep Engineer</td>
+              <td>确认步骤图：谁并行、谁必须等覆盖人数</td>
+              <td>自己设计多功能串联和并发。人数没出，不准做交集。人驳回则重排</td>
+            </tr>
+            <tr>
+              <td>③ 配成定时</td>
+              <td>确认何时跑、以后是否免确认</td>
+              <td>调用已通过的 DAG。登录失效、缺日期则停，只飞书问人</td>
+            </tr>
+            <tr>
+              <td>④ 一起交付</td>
+              <td>提出分析问题（可空）；同一条消息收回两样</td>
+              <td>齐数后按问题写结论，和原数据一起发出。只发结论不算交付</td>
+            </tr>
           </tbody>
         </table>
+        <p class="src">①②③ 的飞书句子在「指令与材料」。④ 收回什么在「原数据与分析」。本机周报 / 月报已经在跑，是 ①② 的样例；飞书 Bot、Deep Engineer、定时、成套分析还待接。</p>
       </div>
     </section>
     <section class="panel" id="talk">
-      <p class="lede">这一页给①改单功能、②设计 DAG、③配定时、以及日常喊已有能力时用。人从左侧点对应步骤，复制到飞书。OpenClaw 必须先确认再做；四段不要混在一条指令里。</p>
+      <p class="lede">飞书句子按主线拆开用：①改单功能、②设计 DAG、③配定时、日常喊已有能力。不要把四段写进同一条。</p>
       <div class="card" style="margin-bottom:16px">
         <h2>每次都用的句子骨架</h2>
         <div class="say">任务：&lt;下面左侧的功能名&gt;
