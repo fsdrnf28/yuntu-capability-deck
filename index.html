@@ -202,9 +202,9 @@
       <button data-tab="cards">卡片与字段</button>
       <button data-tab="weekly">周报拓扑</button>
       <button data-tab="monthly">月报拓扑</button>
-      <button class="pri" data-tab="claw">OpenClaw ① 主线</button>
-      <button class="pri" data-tab="talk">OpenClaw ② 指令</button>
-      <button class="pri" data-tab="analysis">OpenClaw ③ 交付</button>
+      <button class="pri" data-tab="claw">先 · OpenClaw 主线</button>
+      <button class="pri" data-tab="talk">中 · 飞书指令</button>
+      <button class="pri" data-tab="analysis">后 · 成套交付</button>
     </div>
 
     <section class="panel on" id="map">
@@ -553,7 +553,7 @@ OpenClaw 确认卡必须拆开：先改哪一个功能 → 再怎么串进整条
       </div>
       <div class="card" style="margin-bottom:16px">
         <h2>④ 交付形式：原数据和分析结论必须一起给</h2>
-        <p>不是「跑完就算」。全部做完后，按分析问题写结论，和原数据放在同一条飞书里。只发结论、不发原数据，视为没交付。细节见「OpenClaw ③ 交付」。</p>
+        <p>不是「跑完就算」。全部做完后，按分析问题写结论，和原数据放在同一条飞书里。只发结论、不发原数据，视为没交付。细节见「后 · 成套交付」。</p>
         <div class="chain-head"><span></span><span>人</span><span>OpenClaw</span></div>
         <div class="chain-step">
           <div class="n">1</div>
@@ -596,7 +596,7 @@ OpenClaw 确认卡必须拆开：先改哪一个功能 → 再怎么串进整条
       </div>
     </section>
     <section class="panel" id="talk">
-      <p class="lede">接在「OpenClaw ① 主线」之后：按功能复制飞书指令。改写单模块、编排 DAG、配置定时、日常执行不要写进同一条消息。</p>
+      <p class="lede">按主线复制飞书指令：①改写单模块、②编排 DAG、③配置定时、以及日常执行已有能力。四段不要写进同一条消息。</p>
       <div class="card" style="margin-bottom:16px">
         <h2>每次都用的句子骨架</h2>
         <div class="say">任务：&lt;下面左侧的功能名&gt;
@@ -633,7 +633,7 @@ OpenClaw 确认卡必须拆开：先改哪一个功能 → 再怎么串进整条
     </section>
 
     <section class="panel" id="analysis">
-      <p class="lede">接在「OpenClaw ② 指令」之后：全部做完，原数据和分析结论必须同一条飞书一起给到用户。只给结论、不给原数据，不算交付。</p>
+      <p class="lede">这一页对应合作链第 ④ 段：全部做完后的交付形式。原数据和分析结论必须同一条飞书一起给到用户。只给结论、不给原数据，不算交付。</p>
       <div class="card" style="margin-bottom:16px">
         <h2>交付形式：原数据 + 分析结论一起到</h2>
         <div class="chain-head"><span></span><span>人</span><span>OpenClaw</span></div>
@@ -1149,7 +1149,7 @@ OpenClaw 确认卡必须拆开：先改哪一个功能 → 再怎么串进整条
         does: "改词包配置，不改卡片类型。",
         back: "新旧词数量、将重建哪些标签/包。" }
     ];
-    const TALK_GROUPS = [["一次","一次性"],["周报","周报"],["月报","月报"],["分析","交付"],["扩展","扩展"],["改卡","改卡片参数"]];
+    const TALK_GROUPS = [["一次","一次性"],["周报","周报"],["月报","月报"],["分析","④ 交付"],["扩展","①②③ 扩展"],["改卡","改卡片参数"]];
     let talkId = "w-full";
     function talkCur() { return TALKS.find((t) => t.id === talkId) || TALKS[0]; }
     function renderTalk() {
